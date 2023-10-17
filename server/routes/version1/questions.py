@@ -70,8 +70,8 @@ async def get_all_questions(question_status:  Annotated[list[str] | None, Query(
 
             return response
         except Exception as e:
-            raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR,
-                                detail="An error occured: " + str(e)) 
+            raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                                    detail="An error occured: " + str(e)) 
 
 ###############################
 # get question by id endpoint #
@@ -95,10 +95,14 @@ async def get_question_by_id(question_id: str):
         except Exception as e:
             if str(e) == '404':
                 raise HTTPException(status.HTTP_404_NOT_FOUND,
-                                detail="username or password is incorrect")
+                                detail="Question not found") 
             
-            raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR,
-                                detail="An error occured: " + str(e)) 
+            if 'not a valid ObjectId' in str(e):
+                raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                                    detail="Question not found")
+        
+            raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                                    detail="An error occured: " + str(e)) 
 
 ############################
 # create question endpoint #
@@ -118,7 +122,7 @@ async def create_question(request: Request,
 
             return {"detail": "Successfully Added Question",  "question_id": str(question.id)}
         except Exception as e:
-            raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR,
+            raise HTTPException(status.HTTP_400_BAD_REQUEST,
                                 detail="An error occured: " + str(e))
         
 
@@ -153,10 +157,14 @@ async def update_question(request: Request,
         except Exception as e:
             if str(e) == '404':
                 raise HTTPException(status.HTTP_404_NOT_FOUND,
-                                detail="username or password is incorrect")
+                                detail="Question not found") 
             
-            raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR,
-                                detail="An error occured: " + str(e)) 
+            if 'not a valid ObjectId' in str(e):
+                raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                                    detail="Question not found")
+        
+            raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                                    detail="An error occured: " + str(e)) 
 
 ###################################
 # update question status endpoint #
@@ -185,7 +193,7 @@ async def update_question_status(question_id: str,
     except Exception as e:
         if str(e) == '404':
             raise HTTPException(status.HTTP_404_NOT_FOUND,
-                                detail="username or password is incorrect")
+                                detail="Question not found") 
         
         if 'not a valid ObjectId' in str(e):
             raise HTTPException(status.HTTP_400_BAD_REQUEST,
@@ -218,8 +226,12 @@ async def delete_question(question_id: str):
         except Exception as e:
             if str(e) == '404':
                 raise HTTPException(status.HTTP_404_NOT_FOUND,
-                                detail="username or password is incorrect")
+                                detail="Question not found") 
             
-            raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR,
-                                detail="An error occured: " + str(e)) 
+            if 'not a valid ObjectId' in str(e):
+                raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                                    detail="Question not found")
+        
+            raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                                    detail="An error occured: " + str(e)) 
     
