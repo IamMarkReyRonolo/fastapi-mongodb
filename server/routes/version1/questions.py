@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Request, Depends, status, HTTPException, Body, Query
 from typing import Any, Annotated
-import math
+from pymongo import ReturnDocument
+from bson import ObjectId
+import math, json
 from server.authentication.jwt_bearer import JWTBearer
 from server.models.utilities import sample_payloads, model_parser
 from server.connection.database import db
@@ -8,7 +10,8 @@ from server.models.question import (
     Question,
     StaarQuestion,
     CollegeQuestion,
-    MathworldQuestion
+    MathworldQuestion,
+    UpdateQuestionStatus
 )
 
 router = APIRouter()
@@ -153,6 +156,42 @@ async def update_question(request: Request,
                                 detail="username or password is incorrect")
             
             raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                detail="An error occured: " + str(e)) 
+
+###################################
+# update question status endpoint #
+###################################
+
+@router.patch("/update/question_status/{question_id}", dependencies=[Depends(JWTBearer(access_level='staff'))], status_code=status.HTTP_200_OK)
+async def update_question_status(question_id: str,
+                                 request: Request,
+                                 status_update: UpdateQuestionStatus,
+                                 ):
+    try:
+        status_update.reviewed_by = request.state.user_details['name']
+        question = await db['question_collection'].find_one_and_update({'_id': ObjectId(question_id)},
+                                                                        {'$set': {'question_status': status_update.status,
+                                                                                'reviewed_by' : status_update.reviewed_by,
+                                                                                'reviewed_at' : status_update.reviewed_at}},
+                                                                        return_document=ReturnDocument.AFTER
+                                                                        )
+        question = json.loads(model_parser.JSONEncoder().encode(question))
+        if question:
+            return {'data': question}
+        
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                                detail="Question not found") 
+        
+    except Exception as e:
+        if str(e) == '404':
+            raise HTTPException(status.HTTP_404_NOT_FOUND,
+                                detail="username or password is incorrect")
+        
+        if 'not a valid ObjectId' in str(e):
+            raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                                detail="Question not found")
+        
+        raise HTTPException(status.HTTP_400_BAD_REQUEST,
                                 detail="An error occured: " + str(e)) 
         
 

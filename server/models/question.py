@@ -125,7 +125,12 @@ class UpdateQuestionStatus(BaseModel):
         return v or datetime.utcnow()
 
     class Config:
-        from_attributes = True
+        json_schema_extra = {
+            "example": {
+                "status": "Approved",
+                "update_note": "Update message"
+            }
+        }
         
 def ErrorResponseModel(error, code, message):
     return {"error": error, "code": code, "message": message}
