@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from server.routes.version1.questions import router as QuestionRouterV1
 from server.routes.version1.accounts import router as AccountRouterV1
+from server.routes.version1.activities import router as ActivityRouterV1
 from server.connection.database import init_db
 app = FastAPI()
 
@@ -23,3 +24,4 @@ async def read_root():
 
 app.include_router(QuestionRouterV1, tags=["Questions"], prefix="/v1/questions")
 app.include_router(AccountRouterV1, tags=["Accounts"], prefix="/v1/accounts")
+app.include_router(ActivityRouterV1, tags=["Activities"], prefix="/v1/activities")

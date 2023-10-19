@@ -13,6 +13,7 @@ from server.models.question import (
     MathworldQuestion,
     UpdateQuestionStatus
 )
+from server.controllers import activity_controller
 
 router = APIRouter()
 
@@ -84,10 +85,10 @@ async def get_all_questions(question_status:  Annotated[list[str] | None, Query(
             )
 async def get_question_by_id(question_id: str):
         try:
-            fetched_question = await Question.get(question_id)
-
+            fetched_question = await db['question_collection'].find_one({"_id": ObjectId(question_id)})
             if fetched_question:
-                return {"question": fetched_question}
+                parsed_question = model_parser.parse_response([fetched_question])[0]
+                return {"question": parsed_question}
 
             raise HTTPException(status.HTTP_404_NOT_FOUND,
                                 detail="Question not found") 
@@ -119,6 +120,10 @@ async def create_question(request: Request,
         try:
             question.created_by = request.state.user_details['name']
             await question.insert()
+            await activity_controller.record_activity(activity_title='Create',
+                                                    staff_involved=question.created_by,
+                                                    staff_uuid=request.state.user_details['uuid'],
+                                                    question=question)
 
             return {"detail": "Successfully Added Question",  "question_id": str(question.id)}
         except Exception as e:
@@ -148,6 +153,11 @@ async def update_question(request: Request,
                 question = await fetched_question.update(
                     {"$set": updated_question.dict()}
                 )
+                await activity_controller.record_activity(activity_title='Update',
+                                                        staff_involved=question.updated_by,
+                                                        staff_uuid=request.state.user_details['uuid'],
+                                                        update_note=updated_question.update_note,
+                                                        question=question)
 
                 return {"detail": "Successfully Updated Question",  "question": question}
             
@@ -212,12 +222,17 @@ async def update_question_status(question_id: str,
             dependencies=[Depends(JWTBearer(access_level='staff'))],
             status_code=status.HTTP_201_CREATED,
             response_description="Question has been deleted in the database")
-async def delete_question(question_id: str):
+async def delete_question(question_id: str, request: Request,):
         try:
-            fetched_question = await Question.get(question_id)
-            if fetched_question:
-                await fetched_question.delete()
 
+            deleted_question = await db['question_collection'].find_one_and_delete({"_id": ObjectId(question_id)})
+
+            if deleted_question:
+                parsed_question = model_parser.parse_response([deleted_question])[0]
+                await activity_controller.record_activity(activity_title='Delete',
+                                                        staff_involved=request.state.user_details['name'],
+                                                        staff_uuid=request.state.user_details['uuid'],
+                                                        question=parsed_question)
                 return {"detail": "Successfully Deleted Question"}
 
             raise HTTPException(status.HTTP_404_NOT_FOUND,
