@@ -23,7 +23,7 @@ router = APIRouter()
 
 @router.get("/",
             dependencies=[Depends(JWTBearer(access_level='staff'))],
-            status_code=status.HTTP_201_CREATED,
+            status_code=status.HTTP_200_OK,
             response_description="Fetch all questions from the database with pagination"
             )
 async def get_all_questions(question_status:  Annotated[list[str] | None, Query()] = None,
@@ -80,7 +80,7 @@ async def get_all_questions(question_status:  Annotated[list[str] | None, Query(
 
 @router.get("/{question_id}",
             dependencies=[Depends(JWTBearer(access_level='staff'))],
-            status_code=status.HTTP_201_CREATED,
+            status_code=status.HTTP_200_OK,
             response_description="Fetch specific question by id from the database"
             )
 async def get_question_by_id(question_id: str):
@@ -102,6 +102,59 @@ async def get_question_by_id(question_id: str):
                 raise HTTPException(status.HTTP_400_BAD_REQUEST,
                                     detail="Question not found")
         
+            raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                                    detail="An error occured: " + str(e))
+            
+            
+###########################
+# get question statistics #
+###########################
+
+@router.get("/statistics/all",
+            dependencies=[Depends(JWTBearer(access_level='staff'))],
+            status_code=status.HTTP_200_OK,
+            response_description="Fetch question statistics"
+            )
+async def get_question_statistics(request: Request):
+        try:
+            
+            pipeline = [
+                {
+                    "$group": {
+                        "_id": "$question_type",
+                        "no_of_approved_questions": {
+                            "$sum": {
+                                "$cond": [{"$eq": ["$question_status", "Approved"]}, 1, 0]
+                            }
+                        },
+                        "no_of_pending_questions": {
+                            "$sum": {
+                                "$cond": [{"$eq": ["$question_status", "Pending"]}, 1, 0]
+                            }
+                        },
+                        "no_of_reported_questions": {
+                            "$sum": {
+                                "$cond": [{"$eq": ["$question_status", "Reported"]}, 1, 0]
+                            }
+                        },
+                        "total_no_of_questions": {"$sum": 1}
+                    }
+                },
+                {
+                    "$project": {
+                        "_id": 0,
+                        "question_type": "$_id",
+                        "no_of_approved_questions": 1,
+                        "no_of_pending_questions": 1,
+                        "no_of_reported_questions": 1,
+                        "total_no_of_questions": 1
+                    }
+                }
+            ]
+            
+            result = await db['question_collection'].aggregate(pipeline).to_list(None)
+            return {'data': result}
+        except Exception as e:
             raise HTTPException(status.HTTP_400_BAD_REQUEST,
                                     detail="An error occured: " + str(e)) 
 
@@ -220,7 +273,7 @@ async def update_question_status(question_id: str,
 
 @router.delete("/delete/{question_id}",
             dependencies=[Depends(JWTBearer(access_level='staff'))],
-            status_code=status.HTTP_201_CREATED,
+            status_code=status.HTTP_200_OK,
             response_description="Question has been deleted in the database")
 async def delete_question(question_id: str, request: Request,):
         try:
