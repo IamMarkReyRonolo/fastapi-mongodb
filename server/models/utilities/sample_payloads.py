@@ -154,3 +154,31 @@ updated_question_payload={
                     }
                 },
             }
+
+
+updated_account_payload={
+                "staff_orr_admin_update_details": {
+                    "summary": "Update staff or admin account details",
+                    "description": "Update staff or admin account details",
+                    "value":{
+                        "first_name": "John",
+                        "middle_name": "Dee",
+                        "last_name": "Doe",
+                        "role": "staff",
+                        "email": "john_d_doe@gmail.com"
+                    },
+                    
+                },
+                "subscriber_update_details": {
+                    "summary": "Update subsriber account details",
+                    "description": "Update subsriber account details",
+                    "value":{
+                        "first_name": "John",
+                        "middle_name": "Dee",
+                        "last_name": "Doe",
+                        "role": "staff",
+                        "school": "Harvard University",
+                        "email": "john_d_doe@gmail.com"
+                    },
+                },
+            }

@@ -12,6 +12,20 @@ from server.models.validators.question_request_root_validators import (
     validate_updated_status_fields
 )
 
+class Activity(Document):
+    title: str
+    details: str
+    staff_involved: str
+    question_id: Optional[str]
+    staff_id: Optional[str]
+    created_at:  Optional[datetime] = None
+
+    @validator('created_at', pre=True, always=True)
+    def set_created_at_now(v):
+        return v or datetime.utcnow()
+    
+    class Settings:
+        name = "acitivity_collection"
 
 class Option(BaseModel):
     letter: str
@@ -78,7 +92,7 @@ class MathworldQuestion(Question):
 
 
 class UpdatedStaarQuestion(StaarQuestion):
-    update_note: str = Field(examples=["Foo"])
+    update_note: str = Field()
     updated_by: Optional[str] = None
     updated_at: Optional[datetime] = None
     options: List[Option]

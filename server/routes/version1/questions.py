@@ -13,6 +13,7 @@ from server.models.question import (
     MathworldQuestion,
     UpdateQuestionStatus
 )
+from server.controllers import activity_controller
 
 router = APIRouter()
 
@@ -22,14 +23,14 @@ router = APIRouter()
 
 @router.get("/",
             dependencies=[Depends(JWTBearer(access_level='staff'))],
-            status_code=status.HTTP_201_CREATED,
+            status_code=status.HTTP_200_OK,
             response_description="Fetch all questions from the database with pagination"
             )
 async def get_all_questions(question_status:  Annotated[list[str] | None, Query()] = None,
                             question_type: Annotated[list[str] | None, Query()] = None,
                             response_type: Annotated[list[str] | None, Query()] = None,
                             keywords: Annotated[list[str] | None, Query()] = None,
-                            grade_level: Annotated[list[str] | None, Query()] = None,
+                            grade_level: Annotated[list[int] | None, Query()] = None,
                             release_date: Annotated[list[str] | None, Query()] = None,
                             category: Annotated[list[str] | None, Query()] = None,
                             student_expectations: Annotated[list[str] | None, Query()] = None,
@@ -41,6 +42,13 @@ async def get_all_questions(question_status:  Annotated[list[str] | None, Query(
                             test_code: Annotated[list[str] | None, Query()] = None,
                             page_num: int = 1,
                             page_size: int = 10):
+        if(page_num <=0 ):
+                raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                                    detail="Page number should not be equal or less than to 0")
+
+        if(page_size <= 0):
+            raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                                    detail="Page size should not be equal or less than to 0")
         try: 
             # default status
             question_status = ['Pending'] if question_status is None else question_status
@@ -55,7 +63,7 @@ async def get_all_questions(question_status:  Annotated[list[str] | None, Query(
                     query['$and'].append({k: {"$in": v}})
                     pagination_filter[k] = v
 
-            questions = await db['question_collection'].find(query).sort('updated_at', -1).skip((page_num - 1) * page_size).limit(page_size).to_list(1000)
+            questions = await db['question_collection'].find(query).sort('updated_at', -1).skip((page_num - 1) * page_size).limit(page_size).to_list(None)
             total_count = await db['question_collection'].count_documents(query)
             questions = model_parser.parse_response(questions)
 
@@ -79,15 +87,15 @@ async def get_all_questions(question_status:  Annotated[list[str] | None, Query(
 
 @router.get("/{question_id}",
             dependencies=[Depends(JWTBearer(access_level='staff'))],
-            status_code=status.HTTP_201_CREATED,
+            status_code=status.HTTP_200_OK,
             response_description="Fetch specific question by id from the database"
             )
 async def get_question_by_id(question_id: str):
         try:
-            fetched_question = await Question.get(question_id)
-
+            fetched_question = await db['question_collection'].find_one({"_id": ObjectId(question_id)})
             if fetched_question:
-                return {"question": fetched_question}
+                parsed_question = model_parser.parse_response([fetched_question])[0]
+                return {"question": parsed_question}
 
             raise HTTPException(status.HTTP_404_NOT_FOUND,
                                 detail="Question not found") 
@@ -101,6 +109,59 @@ async def get_question_by_id(question_id: str):
                 raise HTTPException(status.HTTP_400_BAD_REQUEST,
                                     detail="Question not found")
         
+            raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                                    detail="An error occured: " + str(e))
+            
+            
+###########################
+# get question statistics #
+###########################
+
+@router.get("/statistics/all",
+            dependencies=[Depends(JWTBearer(access_level='staff'))],
+            status_code=status.HTTP_200_OK,
+            response_description="Fetch question statistics"
+            )
+async def get_question_statistics(request: Request):
+        try:
+            
+            pipeline = [
+                {
+                    "$group": {
+                        "_id": "$question_type",
+                        "no_of_approved_questions": {
+                            "$sum": {
+                                "$cond": [{"$eq": ["$question_status", "Approved"]}, 1, 0]
+                            }
+                        },
+                        "no_of_pending_questions": {
+                            "$sum": {
+                                "$cond": [{"$eq": ["$question_status", "Pending"]}, 1, 0]
+                            }
+                        },
+                        "no_of_reported_questions": {
+                            "$sum": {
+                                "$cond": [{"$eq": ["$question_status", "Reported"]}, 1, 0]
+                            }
+                        },
+                        "total_no_of_questions": {"$sum": 1}
+                    }
+                },
+                {
+                    "$project": {
+                        "_id": 0,
+                        "question_type": "$_id",
+                        "no_of_approved_questions": 1,
+                        "no_of_pending_questions": 1,
+                        "no_of_reported_questions": 1,
+                        "total_no_of_questions": 1
+                    }
+                }
+            ]
+            
+            result = await db['question_collection'].aggregate(pipeline).to_list(None)
+            return {'data': result}
+        except Exception as e:
             raise HTTPException(status.HTTP_400_BAD_REQUEST,
                                     detail="An error occured: " + str(e)) 
 
@@ -119,6 +180,10 @@ async def create_question(request: Request,
         try:
             question.created_by = request.state.user_details['name']
             await question.insert()
+            await activity_controller.record_activity(activity_title='Create',
+                                                    staff_involved=question.created_by,
+                                                    staff_uuid=request.state.user_details['uuid'],
+                                                    question=question)
 
             return {"detail": "Successfully Added Question",  "question_id": str(question.id)}
         except Exception as e:
@@ -148,6 +213,11 @@ async def update_question(request: Request,
                 question = await fetched_question.update(
                     {"$set": updated_question.dict()}
                 )
+                await activity_controller.record_activity(activity_title='Update',
+                                                        staff_involved=question.updated_by,
+                                                        staff_uuid=request.state.user_details['uuid'],
+                                                        update_note=updated_question.update_note,
+                                                        question=question)
 
                 return {"detail": "Successfully Updated Question",  "question": question}
             
@@ -210,14 +280,19 @@ async def update_question_status(question_id: str,
 
 @router.delete("/delete/{question_id}",
             dependencies=[Depends(JWTBearer(access_level='staff'))],
-            status_code=status.HTTP_201_CREATED,
+            status_code=status.HTTP_200_OK,
             response_description="Question has been deleted in the database")
-async def delete_question(question_id: str):
+async def delete_question(question_id: str, request: Request,):
         try:
-            fetched_question = await Question.get(question_id)
-            if fetched_question:
-                await fetched_question.delete()
 
+            deleted_question = await db['question_collection'].find_one_and_delete({"_id": ObjectId(question_id)})
+
+            if deleted_question:
+                parsed_question = model_parser.parse_response([deleted_question])[0]
+                await activity_controller.record_activity(activity_title='Delete',
+                                                        staff_involved=request.state.user_details['name'],
+                                                        staff_uuid=request.state.user_details['uuid'],
+                                                        question=parsed_question)
                 return {"detail": "Successfully Deleted Question"}
 
             raise HTTPException(status.HTTP_404_NOT_FOUND,

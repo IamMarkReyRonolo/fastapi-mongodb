@@ -1,8 +1,9 @@
 from enum import Enum
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, model_validator
-from beanie import Document
+from pydantic import BaseModel, model_validator, validator, Field 
+from bson import ObjectId
+from beanie import Document, PydanticObjectId
 from server.models.validators.accounts_validator import (
     validate_fields
 )
@@ -23,6 +24,17 @@ class Account(Document):
     email: str
     password: str
     created_by: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_by: Optional[str] = None
+    updated_at: Optional[datetime] = None
+
+    @validator('updated_at', pre=True, always=True)
+    def set_updated_at_now(v):
+        return v or datetime.utcnow()
+    
+    @validator('created_at', pre=True, always=True)
+    def set_created_at_now(v):
+        return v or datetime.utcnow()
     
     class Settings:
         name = "account_collection"
@@ -64,3 +76,52 @@ class Registration(Account):
                 "repeat_password": "Heyy123!"
             }
         }
+
+class UpdatedAccount(BaseModel):
+    first_name: str
+    middle_name: Optional[str] = None
+    last_name: str
+    role: str
+    email: str
+    updated_by: Optional[str] = None
+    updated_at: Optional[datetime] = None
+
+    @validator('updated_at', pre=True, always=True)
+    def set_updated_at_now(v):
+        return v or datetime.utcnow()
+    
+
+class UpdatedSubscriberAccount(UpdatedAccount):
+    school: str
+
+class UpdatedPassword(BaseModel):
+    old_password: str
+    new_password: str
+    repeat_new_password: str
+    updated_by: Optional[str] = None
+    updated_at: Optional[datetime] = None
+
+    @validator('updated_at', pre=True, always=True)
+    def set_updated_at_now(v):
+        return v or datetime.utcnow()
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "old_password": "Hello123!",
+                'new_password': "HiBro567!",
+                "repeat_new_password": "HiBro567!",
+            }
+        }
+
+class AccountResponseModel(BaseModel):
+    id: PydanticObjectId = Field(alias='_id')
+    first_name: str
+    middle_name: Optional[str] = None
+    last_name: str
+    role: str
+    email: str
+    created_by: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_by: Optional[str] = None
+    updated_at: Optional[datetime] = None

@@ -8,6 +8,10 @@ from server.models.question import (
     UpdatedCollegeQuestion,
     UpdatedMathworldQuestion
 )
+from server.models.account import (
+    UpdatedAccount,
+    UpdatedSubscriberAccount
+)
 
 
 def question_parser(question):
@@ -27,6 +31,13 @@ def updated_question_parser(question):
     elif question['question_type'].strip().title() == 'Mathworld':
         question = UpdatedMathworldQuestion.model_validate(question)
     return question
+
+def updated_account_parser(account):
+    if account['role'].strip() == 'admin' or account['role'].strip() == 'staff':
+        updated_account= UpdatedAccount.model_validate(account)
+    elif account['role'].strip() == 'subscriber':
+        updated_account = UpdatedSubscriberAccount.model_validate(account)
+    return updated_account
 
 
 class JSONEncoder(json.JSONEncoder):
