@@ -2,10 +2,12 @@ from enum import Enum
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, model_validator, validator, Field 
-from bson import ObjectId
+import re
 from beanie import Document, PydanticObjectId
 from server.models.validators.accounts_validator import (
-    validate_fields
+    validate_fields,
+    validate_update_fields,
+    password_must_be_valid
 )
 
 class TypeEnum(str, Enum):
@@ -13,8 +15,6 @@ class TypeEnum(str, Enum):
     admin = 'admin'
     subscriber = 'subscriber'
 
-def ErrorResponseModel(error, code, message):
-    return {"error": error, "code": code, "message": message}
 
 class Account(Document):
     first_name: str
@@ -47,7 +47,17 @@ class LogIn(BaseModel):
     email: str
     password: str
 
-    _validate_fields = model_validator(mode='before')(validate_fields)
+    @validator('email', pre=True, always=True)
+    def check_email(cls, v):
+        if v:
+            regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+            if(re.fullmatch(regex, v)):
+                return v
+            else:
+                raise ValueError('email is invalid')
+        else:
+            raise ValueError('email field should not be empty')
+    
 
     class Config:
         json_schema_extra = {
@@ -85,6 +95,7 @@ class UpdatedAccount(BaseModel):
     email: str
     updated_by: Optional[str] = None
     updated_at: Optional[datetime] = None
+    _validate_fields = model_validator(mode='before')(validate_update_fields)
 
     @validator('updated_at', pre=True, always=True)
     def set_updated_at_now(v):
@@ -100,6 +111,7 @@ class UpdatedPassword(BaseModel):
     repeat_new_password: str
     updated_by: Optional[str] = None
     updated_at: Optional[datetime] = None
+    _validate_fields = model_validator(mode='before')(password_must_be_valid)
 
     @validator('updated_at', pre=True, always=True)
     def set_updated_at_now(v):

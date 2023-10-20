@@ -6,8 +6,8 @@ import math, json
 from server.authentication.jwt_bearer import JWTBearer
 from server.models.utilities import sample_payloads, model_parser
 from server.connection.database import db
+from server.models.validators.query_params_validators import validate_query_params
 from server.models.question import (
-    Question,
     StaarQuestion,
     CollegeQuestion,
     MathworldQuestion,
@@ -42,13 +42,9 @@ async def get_all_questions(question_status:  Annotated[list[str] | None, Query(
                             test_code: Annotated[list[str] | None, Query()] = None,
                             page_num: int = 1,
                             page_size: int = 10):
-        if(page_num <=0 ):
-                raise HTTPException(status.HTTP_400_BAD_REQUEST,
-                                    detail="Page number should not be equal or less than to 0")
+        
+        validate_query_params(page_num=page_num, page_size=page_size)
 
-        if(page_size <= 0):
-            raise HTTPException(status.HTTP_400_BAD_REQUEST,
-                                    detail="Page size should not be equal or less than to 0")
         try: 
             # default status
             question_status = ['Pending'] if question_status is None else question_status
