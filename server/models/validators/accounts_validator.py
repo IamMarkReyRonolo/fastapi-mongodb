@@ -6,6 +6,11 @@ def validate_fields(cls, values):
     values = password_must_be_valid(cls, values)
     return values
 
+def validate_update_fields(cls, values):
+    values = is_not_empty(cls, values)
+    values['email'] = check_email(cls, values['email'])
+    return values
+
 def is_not_empty(cls, values):
     for attr, value in values.items():
         if(attr == "middle_name" or attr == 'created_by' or attr == 'updated_by'):
@@ -23,7 +28,7 @@ def is_not_empty(cls, values):
 
 def password_must_be_valid(cls, values):
     for attr, value in values.items():
-        if(attr == "password" or attr == 'new_password'):
+        if(attr == "password" or attr == 'new_password' or attr == "old_password"):
             reg = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{8,30}$"
 
             # compiling regex
@@ -42,6 +47,11 @@ def password_must_be_valid(cls, values):
         if(attr == 'repeat_password'):
             if(values['password'] != value):
                 raise ValueError('password do not match')
+        
+        if(attr == 'repeat_new_password'):
+            if(values['new_password'] != value):
+                raise ValueError('password do not match')
+        
 
     return values
 

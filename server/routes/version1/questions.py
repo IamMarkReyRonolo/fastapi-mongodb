@@ -6,8 +6,8 @@ import math, json
 from server.authentication.jwt_bearer import JWTBearer
 from server.models.utilities import sample_payloads, model_parser
 from server.connection.database import db
+from server.models.validators.query_params_validators import validate_query_params
 from server.models.question import (
-    Question,
     StaarQuestion,
     CollegeQuestion,
     MathworldQuestion,
@@ -30,7 +30,7 @@ async def get_all_questions(question_status:  Annotated[list[str] | None, Query(
                             question_type: Annotated[list[str] | None, Query()] = None,
                             response_type: Annotated[list[str] | None, Query()] = None,
                             keywords: Annotated[list[str] | None, Query()] = None,
-                            grade_level: Annotated[list[str] | None, Query()] = None,
+                            grade_level: Annotated[list[int] | None, Query()] = None,
                             release_date: Annotated[list[str] | None, Query()] = None,
                             category: Annotated[list[str] | None, Query()] = None,
                             student_expectations: Annotated[list[str] | None, Query()] = None,
@@ -42,6 +42,9 @@ async def get_all_questions(question_status:  Annotated[list[str] | None, Query(
                             test_code: Annotated[list[str] | None, Query()] = None,
                             page_num: int = 1,
                             page_size: int = 10):
+        
+        validate_query_params(page_num=page_num, page_size=page_size)
+
         try: 
             # default status
             question_status = ['Pending'] if question_status is None else question_status
@@ -56,7 +59,7 @@ async def get_all_questions(question_status:  Annotated[list[str] | None, Query(
                     query['$and'].append({k: {"$in": v}})
                     pagination_filter[k] = v
 
-            questions = await db['question_collection'].find(query).sort('updated_at', -1).skip((page_num - 1) * page_size).limit(page_size).to_list(1000)
+            questions = await db['question_collection'].find(query).sort('updated_at', -1).skip((page_num - 1) * page_size).limit(page_size).to_list(None)
             total_count = await db['question_collection'].count_documents(query)
             questions = model_parser.parse_response(questions)
 

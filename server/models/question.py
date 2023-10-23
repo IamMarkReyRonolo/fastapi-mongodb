@@ -2,7 +2,8 @@ from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel, model_validator, validator, Field
 from beanie import Document
-
+import pymongo
+from beanie import Indexed
 from server.models.validators.question_request_root_validators import (
     validate_staar_fields, 
     validate_college_fields, 
@@ -16,8 +17,8 @@ class Activity(Document):
     title: str
     details: str
     staff_involved: str
-    question_id: Optional[str]
-    staff_id: Optional[str]
+    question_id: str
+    staff_id: str
     created_at:  Optional[datetime] = None
 
     @validator('created_at', pre=True, always=True)
@@ -26,6 +27,10 @@ class Activity(Document):
     
     class Settings:
         name = "acitivity_collection"
+        indexes = [
+            [("question_id", 1)],
+            [("staff_id", 1)]
+        ]
 
 class Option(BaseModel):
     letter: str
@@ -39,7 +44,7 @@ class Question(Document):
     response_type: str
     question_content: str
     question_img: Optional[str]
-    question_status: str = 'Pending'
+    question_status: str = "Pending"
     options: List[Option]
     created_by: Optional[str] = None
     created_at: Optional[datetime] = None
@@ -58,6 +63,10 @@ class Question(Document):
 
     class Settings:
         name = "question_collection"
+        indexes = [
+            [("response_type", 1)],
+            [("question_status", 1)]
+        ]
 
 class StaarQuestion(Question):
     question_type: str
@@ -67,6 +76,17 @@ class StaarQuestion(Question):
     student_expectations: List[str]
     keywords: List[str]
     _validate_fields = model_validator(mode='before')(validate_staar_fields)
+    
+    class Settings:
+        name = "question_collection"
+        indexes = [
+            [("question_type", 1)],
+            [("grade_level", 1)],
+            [("release_date", 1)],
+            [("category", 1)],
+            [("student_expectations", 1)],
+            [("keywords", 1)],
+        ]
 
 
 class CollegeQuestion(Question):
@@ -75,6 +95,13 @@ class CollegeQuestion(Question):
     test_code: str
     keywords: List[str]
     _validate_fields =model_validator(mode='before')(validate_college_fields)
+    
+    class Settings:
+        name = "question_collection"
+        indexes = [
+            [("classification", 1)],
+            [("test_code", 1)],
+        ]
 
 
 class MathworldQuestion(Question):
@@ -89,6 +116,15 @@ class MathworldQuestion(Question):
     difficulty: str
     points: int
     _validate_fields =model_validator(mode='before')(validate_mathworld_fields)
+    
+    class Settings:
+        name = "question_collection"
+        indexes = [
+            [("teks_code", 1)],
+            [("subject", 1)],
+            [("topic", 1)],
+            [("difficulty", 1)],
+        ]
 
 
 class UpdatedStaarQuestion(StaarQuestion):
@@ -149,10 +185,4 @@ class UpdateQuestionStatus(BaseModel):
 def ErrorResponseModel(error, code, message):
     return {"error": error, "code": code, "message": message}
 
-# class SuccessCreatedQuestionModel(BaseModel):
-#     return {
-#         "data": [data],
-#         "code": 200,
-#         "message": message,
-#     }
 
