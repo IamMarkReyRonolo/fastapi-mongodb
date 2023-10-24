@@ -155,9 +155,39 @@ updated_question_payload={
                 },
             }
 
+account_payload={
+                "staff_or_admin_create_account": {
+                    "summary": "Create staff or admin account details",
+                    "description": "Create staff or admin account details",
+                    "value":{
+                        "first_name": "John",
+                        "middle_name": "Dee",
+                        "last_name": "Doe",
+                        "role": "staff",
+                        "email": "john_d_doe@gmail.com",
+                        "password": "Heyy123!",
+                        "repeat_password": "Heyy123!"
+                    },
+                    
+                },
+                "subscriber_create_account": {
+                    "summary": "Create subsriber account details",
+                    "description": "Create subsriber account details",
+                    "value":{
+                        "first_name": "John",
+                        "middle_name": "Dee",
+                        "last_name": "Doe",
+                        "role": "subscriber",
+                        "school": "Harvard University",
+                        "email": "john_d_doe@gmail.com",
+                        "password": "Heyy123!",
+                        "repeat_password": "Heyy123!"
+                    },
+                },
+            }
 
 updated_account_payload={
-                "staff_orr_admin_update_details": {
+                "staff_or_admin_update_details": {
                     "summary": "Update staff or admin account details",
                     "description": "Update staff or admin account details",
                     "value":{

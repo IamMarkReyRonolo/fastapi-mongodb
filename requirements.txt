@@ -8,3 +8,9 @@ cryptocode
 python-jose
 passlib
 bcrypt
+faker
+pytest
+requests
+assertpy
+apiclient
+jsoncomparedeep

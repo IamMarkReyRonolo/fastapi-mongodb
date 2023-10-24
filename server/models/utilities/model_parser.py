@@ -1,5 +1,6 @@
 from bson import ObjectId, datetime
 import json
+from fastapi import HTTPException, status
 from server.models.question import (
     StaarQuestion,
     CollegeQuestion,
@@ -9,18 +10,29 @@ from server.models.question import (
     UpdatedMathworldQuestion
 )
 from server.models.account import (
+    Account,
+    SubscriberAccount,
     UpdatedAccount,
     UpdatedSubscriberAccount
 )
 
 
 def question_parser(question):
-    if question['question_type'].strip().upper() == 'STAAR':
+    question_type = question['question_type'].strip()
+    
+    if question_type.upper() == 'STAAR':
         question = StaarQuestion.model_validate(question)
-    elif question['question_type'].strip().title() == 'College Level':
+    elif question_type.title() == 'College Level':
         question = CollegeQuestion.model_validate(question)
-    elif question['question_type'].strip().title() == 'Mathworld':
+    elif question_type.title() == 'Mathworld':
         question = MathworldQuestion.model_validate(question)
+    else:
+        if question_type:
+            raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                                detail="invalid question type")
+        else:
+            raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                                detail="question_type is required")
     return question
 
 def updated_question_parser(question):
@@ -31,6 +43,13 @@ def updated_question_parser(question):
     elif question['question_type'].strip().title() == 'Mathworld':
         question = UpdatedMathworldQuestion.model_validate(question)
     return question
+
+def account_parser(account):
+    if account['role'].strip() == 'admin' or account['role'].strip() == 'staff':
+        created_account= Account.model_validate(account)
+    elif account['role'].strip() == 'subscriber':
+        created_account = SubscriberAccount.model_validate(account)
+    return created_account
 
 def updated_account_parser(account):
     if account['role'].strip() == 'admin' or account['role'].strip() == 'staff':

@@ -49,7 +49,9 @@ async def login(credentials: LogIn):
              status_code=status.HTTP_201_CREATED,
              response_description="Account created"
             )
-async def create_account(request: Request, account: Registration):
+async def create_account(request: Request,
+                        account: Any = Body(openapi_examples=sample_payloads.account_payload)):
+        account = model_parser.account_parser(account)
         try:
             account.created_by = request.state.user_details['name']
             if account.role != 'subscriber':
@@ -131,7 +133,7 @@ async def get_all_accounts(role: str = None, page_num: int = 1, page_size: int =
         total_count = await db['account_collection'].aggregate(pipeline).to_list(None)
         total_count_of_specific_role = total_count[0]['total_no_of_accounts']
         if role:
-            total_count_of_specific_role = total_count[0]['total_no_of_' + role]
+            total_count_of_specific_role = total_count[0]['no_of_' + role]
         response = {
             "data": accounts,
             "count": len(accounts),

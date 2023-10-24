@@ -3,7 +3,8 @@ from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, model_validator, validator, Field 
 import re
-from beanie import Document, PydanticObjectId
+import pymongo
+from beanie import Document, PydanticObjectId, Indexed
 from server.models.validators.accounts_validator import (
     validate_fields,
     validate_update_fields,
@@ -21,7 +22,7 @@ class Account(Document):
     middle_name: Optional[str] = None
     last_name: str
     role: str
-    email: str
+    email: Indexed(str, unique=True)
     password: str
     created_by: Optional[str] = None
     created_at: Optional[datetime] = None
@@ -38,6 +39,9 @@ class Account(Document):
     
     class Settings:
         name = "account_collection"
+        indexes = [
+            [("role", 1)]
+        ]
 
 class SubscriberAccount(Account):
     school: str
