@@ -11,7 +11,7 @@ import logging as logger, pytest
 import lib.common as common
 import lib.generate_token as generate_token
 from lib.requester import Requester
-from payloads.college_question_payloads import get_valid_successful_college_payload
+from payloads.valid_question_payloads import get_valid_successful_college_payload
 
 print("\n---- Setup Test ----\n")
 @fixture(scope="module")
