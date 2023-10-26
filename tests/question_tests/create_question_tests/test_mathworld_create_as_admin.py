@@ -157,40 +157,13 @@ def test_invalid_question_type_with_special_characters(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "$$$$", \
-        "grade_level": 3, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    payload['question_type'] = "$$$$"
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==  "question type must match to the endpoint use: MathWorld"
+    assert json_response['detail'] ==  "invalid question type"
 
 #===============================test 12========================================================
 
