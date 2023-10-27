@@ -173,35 +173,8 @@ def test_invalid_grade_level_out_of_range_higher(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 20, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    payload['grade_level'] = 20
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -216,35 +189,8 @@ def test_invalid_grade_level_out_of_range_lower(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 1, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    payload['grade_level'] = 1
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -253,46 +199,20 @@ def test_invalid_grade_level_out_of_range_lower(get_admin_token):
 
 #==========================test 14=========================================================
 
-@pytest.mark.tc_014
-def test_invalid_grade_level_leading_zero(get_admin_token):
-    req = Requester()
-    header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/v1/questions/create"
+# @pytest.mark.tc_014
+# def test_invalid_grade_level_leading_zero(get_admin_token):
+#     req = Requester()
+#     header: dict = req.create_basic_headers(token=get_admin_token)
+#     url = f"{req.base_url}/v1/questions/create"
 
 
-    
+#     payload = get_valid_successful_mathworld_payload()
+#     payload['grade_level'] = 09
 
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 09, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
-
-    response = requests.request("POST", url, headers=header, json=payload)
-    json_response = json.loads(response.text)
-    assert response.status_code == 400
-    assert json_response['detail'] ==   "Invalid Payload"
+#     response = requests.request("POST", url, headers=header, json=payload)
+#     json_response = json.loads(response.text)
+#     assert response.status_code == 400
+#     assert json_response['detail'] ==   "Invalid Payload"
 
 #==========================test 15=================================================
 
@@ -302,35 +222,8 @@ def test_invalid_grade_level_nonInteger(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 10.6, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    payload['grade_level'] = 10.6
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -345,40 +238,13 @@ def test_invalid_grade_level_empty(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": "", \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    payload['grade_level'] = ' '
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==   "grade_level is required"
+    assert json_response['detail'] ==   "grade level must be an integer"
 
 #==========================test 17==========================================================
 
@@ -388,35 +254,8 @@ def test_invalid_grade_level_non_numeric(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": "abc", \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    payload['grade_level'] = 'abc'
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -431,34 +270,8 @@ def test_invalid_grade_level_special_char(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": "$$", \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['grade_level'] = '$$'
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -474,35 +287,8 @@ def test_invalid_grade_level_negative_integer(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": -11, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    payload['grade_level'] = -11
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -518,34 +304,8 @@ def test_invalid_grade_level_valid_but_string(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": "11", \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    payload['grade_level'] = '11'
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -560,40 +320,13 @@ def test_invalid_grade_level_blank(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": , \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    del payload['grade_level']
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==   "Invalid Payload"
+    assert json_response['detail'] ==   "grade_level is required"
 
 #==================================test 22 ===================================================
 
@@ -603,35 +336,8 @@ def test_invalid_teks_code_out_of_range(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.25", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    payload['teks_code'] = "A.25"
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -648,33 +354,8 @@ def test_invalid_teks_code_non_A(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "X.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['teks_code'] = "X.1"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -692,33 +373,8 @@ def test_invalid_teks_code_mallformed(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.05", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['teks_code'] = "A.05"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -735,35 +391,8 @@ def test_invalid_teks_code_multiple_periods(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A..5", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    payload['teks_code'] = "A..5"
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -780,34 +409,8 @@ def test_invalid_teks_code_no_period(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A5", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    payload['teks_code'] = "A5"
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -823,35 +426,8 @@ def test_invalid_teks_code_missing_letter(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": ".5", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    payload['teks_code'] = ".5"
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -868,33 +444,8 @@ def test_invalid_teks_white_space(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A .5", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['teks_code'] = "A .5"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -912,33 +463,8 @@ def test_invalid_teks_code_multiple_A(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "AAA.5", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['teks_code'] = "AAA.5"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -956,33 +482,8 @@ def test_invalid_teks_leading_zero(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.05", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['teks_code'] = "A.05"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -1000,39 +501,14 @@ def test_missing_subject(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": , \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    del payload['subject']
 
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==   "Invalid Payload"
+    assert json_response['detail'] ==   "subject is required"
 
 #=================================test 32=================================================
 
@@ -1044,33 +520,8 @@ def test_empty_subject(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": " ", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = " "
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -1088,33 +539,8 @@ def test_subject_with_special_char(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "A%%%%$$ra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = "A%%%%$$ra I"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -1132,33 +558,8 @@ def test_subject_numeric(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "12345", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = "12345"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -1176,34 +577,8 @@ def test_subject_not_AlgebraI(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Calculus", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = "Calculus"
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -1220,33 +595,8 @@ def test_malformed_subject(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "ALgeBrA I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = "ALgeBrA I"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -1264,33 +614,8 @@ def test_subject_integer(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": 12, \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = 12
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -1308,34 +633,8 @@ def test_subject_with_white_spaces(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "A l g e b r a I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = "A l g e b r a I"
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -1352,33 +651,8 @@ def test_subject_incorrect_spelling(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Allgebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = "Allgebra I"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -1396,33 +670,8 @@ def test_subject_all_small_case(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "algebra i", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = "algebra i"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -1440,33 +689,8 @@ def test_subject_algebra_1(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra 1", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = "Algebra 1"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -1484,39 +708,13 @@ def test_missing_topic(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": , \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    del payload['topic']
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==   "Invalid Payload"
+    assert json_response['detail'] ==   "topic is required"
 
 #================================test 43==============================================
 
@@ -1528,34 +726,8 @@ def test_empty_topic(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": " ", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    payload['topic'] = " "
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -1571,35 +743,8 @@ def test_numeric_topic(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": 12345, \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    payload['topic'] = 12345
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -1615,35 +760,8 @@ def test_topic_with_special_char(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "$$$$$$", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    payload['topic'] = '$$$$$$'
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -1660,33 +778,8 @@ def test_category_out_of_range(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "20", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['category'] = "20"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -1704,33 +797,8 @@ def test_category_negative(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": -5, \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['category'] = -5
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -1748,33 +816,8 @@ def test_category_non_numeric(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "math", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['category'] = "math"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -1792,33 +835,8 @@ def test_category_special_char(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "$5", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['category'] = "$5"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -1836,33 +854,8 @@ def test_category_zero(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "0", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['category'] = "0"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -1880,39 +873,14 @@ def test_category_blank(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
+    payload = get_valid_successful_mathworld_payload()
+    del payload['category']
     
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": , \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==   "Invalid Payload"
+    assert json_response['detail'] ==   "category is required"
 
 #==================================test 52==================================
 
@@ -1924,33 +892,8 @@ def test_category_empty(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": " ", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['category'] = " "
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -1968,33 +911,8 @@ def test_category_malformed(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "00004", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['category'] = "00004"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -2012,39 +930,14 @@ def test_keywords_missing(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "4", \
-        "keywords": , \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    del payload['keywords']
 
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==   "Invalid Payload"
+    assert json_response['detail'] ==   "keywords is required"
 
 #===============================test 55============================================
 
@@ -2055,33 +948,8 @@ def test_keywords_empty(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": [" "], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['keywords'] = [" "]
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -2098,33 +966,8 @@ def test_keywords_special_char(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["$$$##$$$"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['keywords'] = ["$$$##$$$"]
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -2142,39 +985,14 @@ def test_student_expectation_missing(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": , \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    del payload['student_expectations']
 
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==   "Invalid Payload"
+    assert json_response['detail'] ==   "student_expectations is required"
 
 #==================================test 58=====================================
 
@@ -2186,33 +1004,8 @@ def test_student_expectation_empty(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": [" "], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = [" "]
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -2230,33 +1023,8 @@ def test_student_expectation_malformed(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["X.2(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["X.2(A)"]
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -2274,34 +1042,8 @@ def test_student_expectation_out_of_range_letteral(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(Z)"], \
-        "difficulty": "easy", \
-        "points": 2, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["A.1(Z)"]
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -2318,33 +1060,8 @@ def test_student_expectation_out_of_range_numeric(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.25(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["A.25(A)"]
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -2362,33 +1079,8 @@ def test_student_expectation_special_char(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["$.1(%)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["$.1(%)"]
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -2406,33 +1098,8 @@ def test_student_expectation_non_numeric(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["Linear"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["Linear"]
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -2450,33 +1117,8 @@ def test_student_expectation_multiple_periods(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A...1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["A...1(A)"]
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -2494,33 +1136,8 @@ def test_student_expectation_multiple_A(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["AAAA.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["AAAA.1(A)"]
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -2538,33 +1155,8 @@ def test_student_expectation_leading_zero(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.01(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["A.01(A)"]
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -2582,33 +1174,8 @@ def test_student_expectation_numeric(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": [1,2], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = [1,2]
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -2626,33 +1193,8 @@ def test_student_expectation_in_string(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": "A.1(A)", \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = "A.1(A)"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -2670,33 +1212,8 @@ def test_student_expectation_missing_letters(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["A.1"]
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -2714,33 +1231,8 @@ def test_student_expectation_missing_parenthesis(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1A"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["A.1A"]
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -2757,39 +1249,14 @@ def test_difficulty_missing(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": , \
-        "points": 2, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    del payload['difficulty']
 
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==   "Invalid Payload"
+    assert json_response['detail'] ==   "difficulty is required"
 
 #==================================test 72 ========================================
 
@@ -2801,33 +1268,8 @@ def test_difficulty_empty(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": " ", \
-        "points": 2, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['difficulty'] = " "
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -2845,33 +1287,8 @@ def test_difficulty_invalid(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "Algebra I", \
-        "points": 2, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['difficulty'] = "Algebra I"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -2888,33 +1305,8 @@ def test_difficulty_special_char(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "$$$$$$$$$", \
-        "points": 2, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['difficulty'] = "$$$$$$$$$"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -2932,33 +1324,8 @@ def test_difficulty_spelling(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "Easssy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['difficulty'] = "Easssy"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -2976,33 +1343,8 @@ def test_difficulty_numeric(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "12345", \
-        "points": 2, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['difficulty'] = "12345"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -3020,33 +1362,8 @@ def test_difficulty_white_spaces(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "  ea  s y", \
-        "points": 2, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['difficulty'] = "  ea  s y"
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -3064,33 +1381,9 @@ def test_difficulty_incompatible_points_easy(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 5, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['difficulty'] = "easy"
+    payload['points'] = 5
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -3107,33 +1400,9 @@ def test_difficulty_incompatible_points_hard(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "hard", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['difficulty'] = "hard"
+    payload['points'] = 1
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -3151,39 +1420,14 @@ def test_points_missing(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
+    payload = get_valid_successful_mathworld_payload()
+    del payload['points']
     
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "hard", \
-        "points": " ", \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==   "points must be an integer"
+    assert json_response['detail'] ==   "points is required"
 
 #===========================test 81===========================================
 
@@ -3195,33 +1439,8 @@ def test_points_negative(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "hard", \
-        "points": -2, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['points'] = -2
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -3238,33 +1457,8 @@ def test_points_non_integer(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "hard", \
-        "points": 2.5, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['points'] = 2.5
 
 
     response = requests.request("POST", url, headers=header, json=payload)
@@ -3280,33 +1474,8 @@ def test_student_expectation_dict_format(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
 
 
-    
-
-
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": [{"A":"1"}], \
-        "difficulty": "hard", \
-        "points": 2.5, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = [{"A":"1"}]
 
 
     response = requests.request("POST", url, headers=header, json=payload)
