@@ -11,6 +11,7 @@ import logging as logger, pytest
 import lib.common as common
 import lib.generate_token as generate_token
 from lib.requester import Requester
+from payloads.valid_question_payloads import get_valid_successful_mathworld_payload
 
 @fixture(scope="module")
 def get_staff_token():
@@ -24,255 +25,65 @@ def get_staff_token():
 def test_all_fields(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 3, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
 
 #===============================test 2 =========================================================
 @pytest.mark.tc_002
 def test_grade_level_eq_12(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 12, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['grade_level'] = 12
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+
 
 #=========================================test 3=======================================================
 @pytest.mark.tc_003
 def test_blank_question_type(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "", \
-        "grade_level": 3, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['question_type'] = ""
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==  "question_type is required"
 
-#=================================test 4=================================================
-@pytest.mark.tc_004
-def test_invalid_question_type_STAAR(get_staff_token):
-    req = Requester()
-    header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
 
-    payload = {'data': '{ \
-        "question_type": "STAAR", \
-        "grade_level": 3, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
-    json_response = json.loads(response.text)
-    assert response.status_code == 400
-    assert json_response['detail'] ==  "question type must match to the endpoint use: MathWorld"
 
 #========================================test 5============================================
 @pytest.mark.tc_005
 def test_question_type_empty_string(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": " ", \
-        "grade_level": 3, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['question_type'] = " "
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==  "question type must match to the endpoint use: MathWorld"
+    assert json_response['detail'] ==  "question_type is required"
 
-#===============================test 6==========================================================
 
-@pytest.mark.tc_006
-def test_invalid_question_type_college_level(get_staff_token):
-    req = Requester()
-    header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
-
-    payload = {'data': '{ \
-        "question_type": "college level", \
-        "grade_level": 3, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
-
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
-    json_response = json.loads(response.text)
-    assert response.status_code == 400
-    assert json_response['detail'] ==  "question type must match to the endpoint use: MathWorld"
 
 #===============================test 7==========================================================
 
@@ -280,42 +91,15 @@ def test_invalid_question_type_college_level(get_staff_token):
 def test_invalid_question_type_numeric(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "9", \
-        "grade_level": 3, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['question_type'] = "9"
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==  "question type must match to the endpoint use: MathWorld"
+    assert json_response['detail'] == "invalid question type"
 
 #===============================test 8=====================================================
 
@@ -323,42 +107,15 @@ def test_invalid_question_type_numeric(get_staff_token):
 def test_invalid_question_type_includes_empty_string(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "Math World", \
-        "grade_level": 3, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['question_type'] = "Math World"
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==  "question type must match to the endpoint use: MathWorld"
+    assert json_response['detail'] ==  "invalid question type"
 
 #==================================test 9================================================
 
@@ -366,39 +123,12 @@ def test_invalid_question_type_includes_empty_string(get_staff_token):
 def test_invalid_question_type_with_leading_white_space(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "    MathWorld", \
-        "grade_level": 3, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['question_type'] = "   MathWorld"
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] ==  "Successfully Added Question"
@@ -409,39 +139,12 @@ def test_invalid_question_type_with_leading_white_space(get_staff_token):
 def test_invalid_question_type_with_trailing_white_space(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld    ", \
-        "grade_level": 3, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['question_type'] = "MathWorld    "
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] ==  "Successfully Added Question"
@@ -452,42 +155,15 @@ def test_invalid_question_type_with_trailing_white_space(get_staff_token):
 def test_invalid_question_type_with_special_characters(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "$$$$", \
-        "grade_level": 3, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['question_type'] = "$$$$"
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==  "question type must match to the endpoint use: MathWorld"
+    assert json_response['detail'] ==  "invalid question type"
 
 #===============================test 12========================================================
 
@@ -495,39 +171,12 @@ def test_invalid_question_type_with_special_characters(get_staff_token):
 def test_invalid_grade_level_out_of_range_higher(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 20, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "math", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['grade_level'] = 20
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==  "invalid grade level: should only be between 3 to 12"
@@ -538,85 +187,32 @@ def test_invalid_grade_level_out_of_range_higher(get_staff_token):
 def test_invalid_grade_level_out_of_range_lower(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 1, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['grade_level'] = 1
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==  "invalid grade level: should only be between 3 to 12"
 
 #==========================test 14=========================================================
 
-@pytest.mark.tc_014
-def test_invalid_grade_level_leading_zero(get_staff_token):
-    req = Requester()
-    header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+# @pytest.mark.tc_014
+# def test_invalid_grade_level_leading_zero(get_staff_token):
+#     req = Requester()
+#     header: dict = req.create_basic_headers(token=get_staff_token)
+#     url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 09, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "math", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
-    json_response = json.loads(response.text)
-    assert response.status_code == 400
-    assert json_response['detail'] ==   "Invalid Payload"
+#     payload = get_valid_successful_mathworld_payload()
+#     payload['grade_level'] = 09
+
+#     response = requests.request("POST", url, headers=header, json=payload)
+#     json_response = json.loads(response.text)
+#     assert response.status_code == 400
+#     assert json_response['detail'] ==   "Invalid Payload"
 
 #==========================test 15=================================================
 
@@ -624,39 +220,12 @@ def test_invalid_grade_level_leading_zero(get_staff_token):
 def test_invalid_grade_level_nonInteger(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 10.6, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['grade_level'] = 10.6
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "grade level must be an integer"
@@ -667,42 +236,15 @@ def test_invalid_grade_level_nonInteger(get_staff_token):
 def test_invalid_grade_level_empty(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": "", \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['grade_level'] = ' '
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==   "grade_level is required"
+    assert json_response['detail'] ==   "grade level must be an integer"
 
 #==========================test 17==========================================================
 
@@ -710,39 +252,12 @@ def test_invalid_grade_level_empty(get_staff_token):
 def test_invalid_grade_level_non_numeric(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": "abc", \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "math", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['grade_level'] = 'abc'
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "grade level must be an integer"
@@ -753,39 +268,13 @@ def test_invalid_grade_level_non_numeric(get_staff_token):
 def test_invalid_grade_level_special_char(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": "$$", \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['grade_level'] = '$$'
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "grade level must be an integer"
@@ -796,39 +285,12 @@ def test_invalid_grade_level_special_char(get_staff_token):
 def test_invalid_grade_level_negative_integer(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": -11, \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['grade_level'] = -11
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==    "invalid grade level: should only be between 3 to 12"
@@ -839,39 +301,13 @@ def test_invalid_grade_level_negative_integer(get_staff_token):
 def test_invalid_grade_level_valid_but_string(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": "11", \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['grade_level'] = '11'
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "grade level must be an integer"
@@ -882,42 +318,15 @@ def test_invalid_grade_level_valid_but_string(get_staff_token):
 def test_invalid_grade_level_blank(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": , \
-        "teks_code": "A.1", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    del payload['grade_level']
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==   "Invalid Payload"
+    assert json_response['detail'] ==   "grade_level is required"
 
 #==================================test 22 ===================================================
 
@@ -925,39 +334,12 @@ def test_invalid_grade_level_blank(get_staff_token):
 def test_invalid_teks_code_out_of_range(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.25", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['teks_code'] = "A.25"
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid Teks Code"
@@ -969,39 +351,14 @@ def test_invalid_teks_code_out_of_range(get_staff_token):
 def test_invalid_teks_code_non_A(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "X.25", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['teks_code'] = "X.1"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid Teks Code"
@@ -1013,39 +370,14 @@ def test_invalid_teks_code_non_A(get_staff_token):
 def test_invalid_teks_code_mallformed(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.05", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['teks_code'] = "A.05"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid Teks Code"
@@ -1057,39 +389,12 @@ def test_invalid_teks_code_mallformed(get_staff_token):
 def test_invalid_teks_code_multiple_periods(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A...5", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['teks_code'] = "A..5"
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid Teks Code"
@@ -1101,39 +406,13 @@ def test_invalid_teks_code_multiple_periods(get_staff_token):
 def test_invalid_teks_code_no_period(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A5", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['teks_code'] = "A5"
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid Teks Code"
@@ -1145,39 +424,12 @@ def test_invalid_teks_code_no_period(get_staff_token):
 def test_invalid_teks_code_missing_letter(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": ".5", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['teks_code'] = ".5"
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid Teks Code"
@@ -1189,39 +441,14 @@ def test_invalid_teks_code_missing_letter(get_staff_token):
 def test_invalid_teks_white_space(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A   .5", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['teks_code'] = "A .5"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid Teks Code"
@@ -1233,39 +460,14 @@ def test_invalid_teks_white_space(get_staff_token):
 def test_invalid_teks_code_multiple_A(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "AAA.5", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['teks_code'] = "AAA.5"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid Teks Code"
@@ -1277,39 +479,14 @@ def test_invalid_teks_code_multiple_A(get_staff_token):
 def test_invalid_teks_leading_zero(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.0005", \
-        "subject": "Algebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['teks_code'] = "A.05"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid Teks Code"
@@ -1321,42 +498,17 @@ def test_invalid_teks_leading_zero(get_staff_token):
 def test_missing_subject(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": , \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    del payload['subject']
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==   "Invalid Payload"
+    assert json_response['detail'] ==   "subject is required"
 
 #=================================test 32=================================================
 
@@ -1365,39 +517,14 @@ def test_missing_subject(get_staff_token):
 def test_empty_subject(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": " ", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = " "
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "subject should not be empty"
@@ -1409,39 +536,14 @@ def test_empty_subject(get_staff_token):
 def test_subject_with_special_char(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algeb$$ra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = "A%%%%$$ra I"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid Subject"
@@ -1453,39 +555,14 @@ def test_subject_with_special_char(get_staff_token):
 def test_subject_numeric(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "12345", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = "12345"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid Subject"
@@ -1497,39 +574,13 @@ def test_subject_numeric(get_staff_token):
 def test_subject_not_AlgebraI(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Calculus", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = "Calculus"
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid Subject"
@@ -1541,42 +592,17 @@ def test_subject_not_AlgebraI(get_staff_token):
 def test_malformed_subject(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "ALgeBrA I", \
-        "topic": "quantity", \
-        "category": "1, \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = "ALgeBrA I"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==   "Invalid Payload"
+    assert json_response['detail'] ==   "Invalid Subject"
 
 #=================================test 37====================================
 
@@ -1585,39 +611,14 @@ def test_malformed_subject(get_staff_token):
 def test_subject_integer(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": 12, \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = 12
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "subject must be a string"
@@ -1629,39 +630,13 @@ def test_subject_integer(get_staff_token):
 def test_subject_with_white_spaces(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "A l g e b r a I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = "A l g e b r a I"
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid Subject"
@@ -1673,39 +648,14 @@ def test_subject_with_white_spaces(get_staff_token):
 def test_subject_incorrect_spelling(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Allgebra I", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = "Allgebra I"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid Subject"
@@ -1717,39 +667,14 @@ def test_subject_incorrect_spelling(get_staff_token):
 def test_subject_all_small_case(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "algebra i", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = "algebra i"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid Subject"
@@ -1761,39 +686,14 @@ def test_subject_all_small_case(get_staff_token):
 def test_subject_algebra_1(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra 1", \
-        "topic": "quantity", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['subject'] = "Algebra 1"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid Subject"
@@ -1805,42 +705,16 @@ def test_subject_algebra_1(get_staff_token):
 def test_missing_topic(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": , \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    del payload['topic']
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==   "Invalid Payload"
+    assert json_response['detail'] ==   "topic is required"
 
 #================================test 43==============================================
 
@@ -1849,39 +723,13 @@ def test_missing_topic(get_staff_token):
 def test_empty_topic(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": " ", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['topic'] = " "
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "topic should not be empty"
@@ -1893,39 +741,12 @@ def test_empty_topic(get_staff_token):
 def test_numeric_topic(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": 12345, \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['topic'] = 12345
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "topic must be a string"
@@ -1937,39 +758,12 @@ def test_numeric_topic(get_staff_token):
 def test_topic_with_special_char(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "$$$$$$", \
-        "category": "1", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
+    payload = get_valid_successful_mathworld_payload()
+    payload['topic'] = '$$$$$$'
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] ==   "Successfully Added Question"
@@ -1981,39 +775,14 @@ def test_topic_with_special_char(get_staff_token):
 def test_category_out_of_range(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "20", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['category'] = "20"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Valid category is from 1 to 5"
@@ -2025,39 +794,14 @@ def test_category_out_of_range(get_staff_token):
 def test_category_negative(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": -5, \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['category'] = -5
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "category must be a string"
@@ -2069,39 +813,14 @@ def test_category_negative(get_staff_token):
 def test_category_non_numeric(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "math", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['category'] = "math"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Valid category is from 1 to 5"
@@ -2113,39 +832,14 @@ def test_category_non_numeric(get_staff_token):
 def test_category_special_char(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "$5", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['category'] = "$5"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Valid category is from 1 to 5"
@@ -2157,39 +851,14 @@ def test_category_special_char(get_staff_token):
 def test_category_zero(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "0", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['category'] = "0"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Valid category is from 1 to 5"
@@ -2198,45 +867,20 @@ def test_category_zero(get_staff_token):
 
 
 @pytest.mark.tc_051
-def test_empty_category(get_staff_token):
+def test_category_blank(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": , \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    del payload['category']
+    
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==   "Invalid Payload"
+    assert json_response['detail'] ==   "category is required"
 
 #==================================test 52==================================
 
@@ -2245,39 +889,14 @@ def test_empty_category(get_staff_token):
 def test_category_empty(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": " ", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['category'] = " "
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "category should not be empty"
@@ -2289,39 +908,14 @@ def test_category_empty(get_staff_token):
 def test_category_malformed(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "0004", \
-        "keywords": ["happy"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['category'] = "00004"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Valid category is from 1 to 5"
@@ -2333,42 +927,17 @@ def test_category_malformed(get_staff_token):
 def test_keywords_missing(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "4", \
-        "keywords": , \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    del payload['keywords']
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==   "Invalid Payload"
+    assert json_response['detail'] ==   "keywords is required"
 
 #===============================test 55============================================
 
@@ -2376,39 +945,14 @@ def test_keywords_missing(get_staff_token):
 def test_keywords_empty(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": [" "], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['keywords'] = [" "]
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "a value in keywords should not be an empty string"
@@ -2419,39 +963,14 @@ def test_keywords_empty(get_staff_token):
 def test_keywords_special_char(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["$$$##$$$"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['keywords'] = ["$$$##$$$"]
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] ==   "Successfully Added Question"
@@ -2463,42 +982,17 @@ def test_keywords_special_char(get_staff_token):
 def test_student_expectation_missing(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": , \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    del payload['student_expectations']
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==   "Invalid Payload"
+    assert json_response['detail'] ==   "student_expectations is required"
 
 #==================================test 58=====================================
 
@@ -2507,39 +1001,14 @@ def test_student_expectation_missing(get_staff_token):
 def test_student_expectation_empty(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": [" "], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = [" "]
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "student_expectations should not be an empty string"
@@ -2551,39 +1020,14 @@ def test_student_expectation_empty(get_staff_token):
 def test_student_expectation_malformed(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["X.2(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["X.2(A)"]
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid student expectations"
@@ -2595,39 +1039,13 @@ def test_student_expectation_malformed(get_staff_token):
 def test_student_expectation_out_of_range_letteral(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(Z)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["A.1(Z)"]
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid student expectations"
@@ -2639,39 +1057,14 @@ def test_student_expectation_out_of_range_letteral(get_staff_token):
 def test_student_expectation_out_of_range_numeric(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.25(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["A.25(A)"]
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid student expectations"
@@ -2683,39 +1076,14 @@ def test_student_expectation_out_of_range_numeric(get_staff_token):
 def test_student_expectation_special_char(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["$.1(%)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["$.1(%)"]
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid student expectations"
@@ -2727,39 +1095,14 @@ def test_student_expectation_special_char(get_staff_token):
 def test_student_expectation_non_numeric(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["Linear"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["Linear"]
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid student expectations"
@@ -2771,39 +1114,14 @@ def test_student_expectation_non_numeric(get_staff_token):
 def test_student_expectation_multiple_periods(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A...1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["A...1(A)"]
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid student expectations"
@@ -2815,39 +1133,14 @@ def test_student_expectation_multiple_periods(get_staff_token):
 def test_student_expectation_multiple_A(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["AAAA.1(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["AAAA.1(A)"]
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid student expectations"
@@ -2859,39 +1152,14 @@ def test_student_expectation_multiple_A(get_staff_token):
 def test_student_expectation_leading_zero(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.01(A)"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["A.01(A)"]
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid student expectations"
@@ -2903,39 +1171,14 @@ def test_student_expectation_leading_zero(get_staff_token):
 def test_student_expectation_numeric(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": [123], \
-        "difficulty": "easy", \
-        "points": 2, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = [1,2]
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "student_expectations must be a string"
@@ -2944,42 +1187,17 @@ def test_student_expectation_numeric(get_staff_token):
 
 
 @pytest.mark.tc_068
-def test_student_expectation_not_in_list(get_staff_token):
+def test_student_expectation_in_string(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": "A.1(A)", \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = "A.1(A)"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "student_expectations must be a list"
@@ -2991,39 +1209,14 @@ def test_student_expectation_not_in_list(get_staff_token):
 def test_student_expectation_missing_letters(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["A.1"]
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid student expectations"
@@ -3035,39 +1228,14 @@ def test_student_expectation_missing_letters(get_staff_token):
 def test_student_expectation_missing_parenthesis(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1A"], \
-        "difficulty": "easy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = ["A.1A"]
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Invalid student expectations"
@@ -3078,42 +1246,17 @@ def test_student_expectation_missing_parenthesis(get_staff_token):
 def test_difficulty_missing(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": , \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    del payload['difficulty']
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==   "Invalid Payload"
+    assert json_response['detail'] ==   "difficulty is required"
 
 #==================================test 72 ========================================
 
@@ -3122,39 +1265,14 @@ def test_difficulty_missing(get_staff_token):
 def test_difficulty_empty(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": " ", \
-        "points": 2, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['difficulty'] = " "
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "invalid difficulty level"
@@ -3166,39 +1284,14 @@ def test_difficulty_empty(get_staff_token):
 def test_difficulty_invalid(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "Algebra I", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['difficulty'] = "Algebra I"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "invalid difficulty level"
@@ -3209,39 +1302,14 @@ def test_difficulty_invalid(get_staff_token):
 def test_difficulty_special_char(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "$$$$$$$$$", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['difficulty'] = "$$$$$$$$$"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "invalid difficulty level"
@@ -3253,39 +1321,14 @@ def test_difficulty_special_char(get_staff_token):
 def test_difficulty_spelling(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "Easssy", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['difficulty'] = "Easssy"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "invalid difficulty level"
@@ -3297,39 +1340,14 @@ def test_difficulty_spelling(get_staff_token):
 def test_difficulty_numeric(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "12345", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['difficulty'] = "12345"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "invalid difficulty level"
@@ -3341,39 +1359,14 @@ def test_difficulty_numeric(get_staff_token):
 def test_difficulty_white_spaces(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "  ea  s y", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['difficulty'] = "  ea  s y"
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "invalid difficulty level"
@@ -3385,39 +1378,15 @@ def test_difficulty_white_spaces(get_staff_token):
 def test_difficulty_incompatible_points_easy(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "easy", \
-        "points": 5, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['difficulty'] = "easy"
+    payload['points'] = 5
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Difficulty level is incompatible with points assigned."
@@ -3428,39 +1397,15 @@ def test_difficulty_incompatible_points_easy(get_staff_token):
 def test_difficulty_incompatible_points_hard(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "hard", \
-        "points": 1, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['difficulty'] = "hard"
+    payload['points'] = 1
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "Difficulty level is incompatible with points assigned."
@@ -3472,42 +1417,17 @@ def test_difficulty_incompatible_points_hard(get_staff_token):
 def test_points_missing(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "hard", \
-        "points": " ", \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    del payload['points']
+    
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] ==   "points must be an integer"
+    assert json_response['detail'] ==   "points is required"
 
 #===========================test 81===========================================
 
@@ -3516,39 +1436,14 @@ def test_points_missing(get_staff_token):
 def test_points_negative(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "hard", \
-        "points": -2, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['points'] = -2
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "invalid points value: should only be between 1 to 3"
@@ -3559,60 +1454,31 @@ def test_points_negative(get_staff_token):
 def test_points_non_integer(get_staff_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_staff_token)
-    url = f"{req.base_url}/question/mathworld/create"
-    question1 = common.get_random_question()
-    question2 = common.get_random_question()
-    teks_code = common.get_random_tek_code()
-    unit = common.get_random_unit()
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-        "question_type": "MathWorld", \
-        "grade_level": 11, \
-        "teks_code": "A.5", \
-        "subject": "Algebra I", \
-        "topic": "Equations", \
-        "category": "5", \
-        "keywords": ["Linear"], \
-        "student_expectations": ["A.1(A)"], \
-        "difficulty": "hard", \
-        "points": 2.5, \
-        "response_type": "Open Response Exact", \
-        "question_content": "' + question1 + '", \
-        "question_img": "", \
-        "options": [ \
-            { \
-            "letter": "a", \
-            "content": "' + question2 + '", \
-            "image": "", \
-            "unit": "' + unit + '", \
-            "is_answer": true \
-            } \
-        ] \
-        }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    payload = get_valid_successful_mathworld_payload()
+    payload['points'] = 2.5
+
+
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] ==   "points must be an integer"
 
+#=======================================================================================
+@pytest.mark.tc_083
+def test_student_expectation_dict_format(get_staff_token):
+    req = Requester()
+    header: dict = req.create_basic_headers(token=get_staff_token)
+    url = f"{req.base_url}/v1/questions/create"
 
 
+    payload = get_valid_successful_mathworld_payload()
+    payload['student_expectations'] = [{"A":"1"}]
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    response = requests.request("POST", url, headers=header, json=payload)
+    json_response = json.loads(response.text)
+    assert response.status_code == 400
+    assert json_response['detail'] ==   "student_expectations must be a string"
