@@ -14,7 +14,8 @@ from server.models.account import (
   Account,
   AccountResponseModel,
   SubscriberAccount,
-  UpdatedPassword
+  UpdatedPassword,
+  SubscriberAccountResponseModel
 )
 
 router = APIRouter()
@@ -91,11 +92,13 @@ async def get_all_accounts(role: str = None, page_num: int = 1, page_size: int =
     try:
       
         query = {}
-                
+        model = AccountResponseModel
         if role:
             query['role'] =  role
+            if role == 'subscriber':
+                model = SubscriberAccountResponseModel
         
-        accounts = await Account.find(query).project(AccountResponseModel).sort('-updated_at').skip((page_num - 1) * page_size).limit(page_size).to_list(None)
+        accounts = await Account.find(query).project(model).sort('-updated_at').skip((page_num - 1) * page_size).limit(page_size).to_list(None)
 
         pipeline = [
                     {

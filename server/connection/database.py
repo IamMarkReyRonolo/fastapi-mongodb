@@ -2,6 +2,7 @@ from beanie import init_beanie
 import motor.motor_asyncio
 from server.models.question import Question, StaarQuestion, MathworldQuestion, CollegeQuestion, Activity
 from server.models.account import Account, SubscriberAccount
+from server.models.users import User
 from dotenv import load_dotenv
 import os
 
@@ -14,4 +15,5 @@ db = client[DB_NAME]
 async def init_db():
     await init_beanie(database=client[DB_NAME],
                       document_models=[Question, StaarQuestion, MathworldQuestion, CollegeQuestion,
-                                    Account, SubscriberAccount, Activity])
+                                    Account, SubscriberAccount, Activity,
+                                    User])

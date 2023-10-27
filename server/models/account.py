@@ -3,18 +3,12 @@ from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, model_validator, validator, Field 
 import re
-import pymongo
 from beanie import Document, PydanticObjectId, Indexed
 from server.models.validators.accounts_validator import (
     validate_fields,
     validate_update_fields,
     password_must_be_valid
 )
-
-class TypeEnum(str, Enum):
-    staff = 'staff'
-    admin = 'admin'
-    subscriber = 'subscriber'
 
 
 class Account(Document):
@@ -141,3 +135,6 @@ class AccountResponseModel(BaseModel):
     created_at: Optional[datetime] = None
     updated_by: Optional[str] = None
     updated_at: Optional[datetime] = None
+
+class SubscriberAccountResponseModel(AccountResponseModel):
+    school: str
