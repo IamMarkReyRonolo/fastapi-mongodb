@@ -33,7 +33,7 @@ def generate_token(email: str = "", password: str = "")-> str:
             "password": f"{password}"
         })
         headers = {'Content-Type': 'application/json'}
-        response = requests.post(f"{base_url}" + "/v1/accounts/login", data=payload, headers=headers)
+        response = requests.post(f"{base_url}" + "/v1/team_accounts/login", data=payload, headers=headers)
         if response.status_code == 200:
             token_info: dict = json.loads(response.content.decode("utf-8"))
             return token_info['access_token']

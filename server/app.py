@@ -4,6 +4,7 @@ from server.routes.version1.questions import router as QuestionRouterV1
 from server.routes.version1.team_accounts import router as AccountRouterV1
 from server.routes.version1.activities import router as ActivityRouterV1
 from server.routes.version1.subscribers import router as SubscriberRouterV1
+from server.routes.version1.users import router as UserRouterV1
 from server.connection.database import init_db
 app = FastAPI()
 
@@ -27,3 +28,4 @@ app.include_router(QuestionRouterV1, tags=["Questions"], prefix="/v1/questions")
 app.include_router(AccountRouterV1, tags=["Team Accounts"], prefix="/v1/team_accounts")
 app.include_router(ActivityRouterV1, tags=["Activities"], prefix="/v1/activities")
 app.include_router(SubscriberRouterV1, tags=["Subscribers"], prefix="/v1/subscribers")
+app.include_router(UserRouterV1, tags=["Users"], prefix="/v1/users")

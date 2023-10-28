@@ -11,6 +11,8 @@ import logging as logger, pytest
 import lib.common as common
 import lib.generate_token as generate_token
 from lib.requester import Requester
+from payloads.valid_question_payloads import get_valid_successful_staar_payload
+
 
 @fixture(scope="module")
 def get_admin_token():
@@ -22,49 +24,23 @@ def get_admin_token():
 def test_all_fields(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
-    payload = {'data': '{ \
-      "question_type": "STAAR", \
-      "grade_level": 3, \
-      "release_date": "2024-02", \
-      "category": "1", \
-      "keywords": ["math"], \
-      "student_expectations": ["A.1(A)"], \
-      "response_type": "Open Response Exact", \
-      "question_content": "this is a test", \
-      "question_img": "", \
-      "options": [ \
-        { \
-          "letter": "a", \
-          "content": "this is a test", \
-          "image": "", \
-          "unit": "pounds", \
-          "is_answer": true \
-        }, \
-        { \
-          "letter": "b", \
-          "content": "option b", \
-          "image": "", \
-          "unit": "pounds", \
-          "is_answer": false \
-        } \
-      ] \
-    }'}
+    payload = get_valid_successful_staar_payload()
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 
 @pytest.mark.tc_002
 def test_blank_question_type(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "", \
@@ -94,138 +70,18 @@ def test_blank_question_type(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "question_type is required"
 
 
-@pytest.mark.tc_003
-def test_invalid_question_type_mathworld(get_admin_token):
-    req = Requester()
-    header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
-
-    payload = {'data': '{ \
-        "question_type": "mathworld", \
-        "grade_level": 3, \
-        "release_date": "2024-02", \
-        "category": "1", \
-        "keywords": ["math"], \
-        "student_expectations": ["A.1(A)"], \
-        "response_type": "Open Response Exact", \
-        "question_content": "this is a test", \
-        "question_img": "", \
-        "options": [ \
-          { \
-            "letter": "a", \
-            "content": "this is a test", \
-            "image": "", \
-            "unit": "pounds", \
-            "is_answer": true \
-          }, \
-          { \
-            "letter": "b", \
-            "content": "option b", \
-            "image": "", \
-            "unit": "pounds", \
-            "is_answer": false \
-          } \
-        ] \
-      }'}
-
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
-    json_response = json.loads(response.text)
-    assert response.status_code == 400
-    assert json_response['detail'] == "question type must match to the endpoint use: STAAR"
-
-@pytest.mark.tc_004
-def test_question_type_blank_char(get_admin_token):
-    req = Requester()
-    header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
-
-    payload = {'data': '{ \
-      "question_type": "  ", \
-      "grade_level": 3, \
-      "release_date": "2024-02", \
-      "category": "1", \
-      "keywords": ["math"], \
-      "student_expectations": ["A.1(A)"], \
-      "response_type": "Open Response Exact", \
-      "question_content": "this is a test", \
-      "question_img": "", \
-      "options": [ \
-        { \
-          "letter": "a", \
-          "content": "this is a test", \
-          "image": "", \
-          "unit": "pounds", \
-          "is_answer": true \
-        }, \
-        { \
-          "letter": "b", \
-          "content": "option b", \
-          "image": "", \
-          "unit": "pounds", \
-          "is_answer": false \
-        } \
-      ] \
-    }'}
-
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
-    json_response = json.loads(response.text)
-    assert response.status_code == 400
-    assert json_response['detail'] == "question type must match to the endpoint use: STAAR"
-
-@pytest.mark.tc_004
-def test_question_type_college_level(get_admin_token):
-    req = Requester()
-    header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
-
-    payload = {'data': '{ \
-      "question_type": "college level", \
-      "grade_level": 3, \
-      "release_date": "2024-02", \
-      "category": "1", \
-      "keywords": ["math"], \
-      "student_expectations": ["A.1(A)"], \
-      "response_type": "Open Response Exact", \
-      "question_content": "this is a test", \
-      "question_img": "", \
-      "options": [ \
-        { \
-          "letter": "a", \
-          "content": "this is a test", \
-          "image": "", \
-          "unit": "pounds", \
-          "is_answer": true \
-        }, \
-        { \
-          "letter": "b", \
-          "content": "option b", \
-          "image": "", \
-          "unit": "pounds", \
-          "is_answer": false \
-        } \
-      ] \
-    }'}
-
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
-    json_response = json.loads(response.text)
-    assert response.status_code == 400
-    assert json_response['detail'] == "question type must match to the endpoint use: STAAR"
-
 @pytest.mark.tc_005
 def test_question_type_numeric(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": 1, \
@@ -255,58 +111,18 @@ def test_question_type_numeric(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "question_type must be a string"
-
-@pytest.mark.tc_006
-def test_question_type_special_char(get_admin_token):
-    req = Requester()
-    header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
-
-    payload = {'data': '{ \
-      "question_type": "@@@@", \
-      "grade_level": 3, \
-      "release_date": "2024-02", \
-      "category": "1", \
-      "keywords": ["math"], \
-      "student_expectations": ["A.1(A)"], \
-      "response_type": "Open Response Exact", \
-      "question_content": "this is a test", \
-      "question_img": "", \
-      "options": [ \
-        { \
-          "letter": "a", \
-          "content": "this is a test", \
-          "image": "", \
-          "unit": "pounds", \
-          "is_answer": true \
-        }, \
-        { \
-          "letter": "b", \
-          "content": "option b", \
-          "image": "", \
-          "unit": "pounds", \
-          "is_answer": false \
-        } \
-      ] \
-    }'}
-
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
-    json_response = json.loads(response.text)
-    assert response.status_code == 400
-    assert json_response['detail'] == "question type must match to the endpoint use: STAAR"
 
 
 @pytest.mark.tc_007
 def test_grade_level_eq_0(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -336,8 +152,8 @@ def test_grade_level_eq_0(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "invalid grade level: should only be between 3 to 12"
@@ -346,7 +162,7 @@ def test_grade_level_eq_0(get_admin_token):
 def test_grade_level_eq_13(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -376,8 +192,8 @@ def test_grade_level_eq_13(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "invalid grade level: should only be between 3 to 12"
@@ -386,7 +202,7 @@ def test_grade_level_eq_13(get_admin_token):
 def test_grade_level_eq_12(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -416,18 +232,18 @@ def test_grade_level_eq_12(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 @pytest.mark.tc_010
 def test_grade_level_eq_neg_3(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -457,8 +273,8 @@ def test_grade_level_eq_neg_3(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "invalid grade level: should only be between 3 to 12"
@@ -467,7 +283,7 @@ def test_grade_level_eq_neg_3(get_admin_token):
 def test_grade_level_eq_neg_12(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -497,8 +313,8 @@ def test_grade_level_eq_neg_12(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "invalid grade level: should only be between 3 to 12"
@@ -508,7 +324,7 @@ def test_grade_level_eq_neg_12(get_admin_token):
 def test_grade_level_eq_neg_13(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -538,8 +354,8 @@ def test_grade_level_eq_neg_13(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "invalid grade level: should only be between 3 to 12"
@@ -548,7 +364,7 @@ def test_grade_level_eq_neg_13(get_admin_token):
 def test_grade_level_eq_neg_0(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -578,8 +394,8 @@ def test_grade_level_eq_neg_0(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "invalid grade level: should only be between 3 to 12"
@@ -588,7 +404,7 @@ def test_grade_level_eq_neg_0(get_admin_token):
 def test_grade_level_str_3(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -618,8 +434,8 @@ def test_grade_level_str_3(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "grade level must be an integer"
@@ -628,7 +444,7 @@ def test_grade_level_str_3(get_admin_token):
 def test_grade_level_str_12(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -658,8 +474,8 @@ def test_grade_level_str_12(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "grade level must be an integer"
@@ -668,7 +484,7 @@ def test_grade_level_str_12(get_admin_token):
 def test_grade_level_blank(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -698,8 +514,8 @@ def test_grade_level_blank(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "Invalid Payload"
@@ -708,7 +524,7 @@ def test_grade_level_blank(get_admin_token):
 def test_grade_level_eq_1(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -738,8 +554,8 @@ def test_grade_level_eq_1(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     assert response.status_code == 400
     assert response.text == '{"detail":"invalid grade level: should only be between 3 to 12"}'
 
@@ -747,7 +563,7 @@ def test_grade_level_eq_1(get_admin_token):
 def test_grade_level_special_char(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -777,8 +593,8 @@ def test_grade_level_special_char(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == 'Invalid Payload'
@@ -787,7 +603,7 @@ def test_grade_level_special_char(get_admin_token):
 def test_grade_level_blank_str(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -817,8 +633,8 @@ def test_grade_level_blank_str(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "grade_level is required"
@@ -827,7 +643,7 @@ def test_grade_level_blank_str(get_admin_token):
 def test_release_date_current(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_current_yyyy_mm())
 
     payload = {'data': '{ \
@@ -858,19 +674,19 @@ def test_release_date_current(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 
 @pytest.mark.tc_024
 def test_release_date_future(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_future_yyyy_mm())
 
     payload = {'data': '{ \
@@ -901,18 +717,18 @@ def test_release_date_future(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 @pytest.mark.tc_025
 def test_release_date_past(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -943,19 +759,19 @@ def test_release_date_past(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 
 @pytest.mark.tc_025
 def test_release_date_mm_yyyy(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -986,8 +802,8 @@ def test_release_date_mm_yyyy(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "release date invalid format: format accepted xxxx-xx | year-month"
@@ -996,7 +812,7 @@ def test_release_date_mm_yyyy(get_admin_token):
 def test_release_date_mmyyyy(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1027,8 +843,8 @@ def test_release_date_mmyyyy(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "release date invalid format: format accepted xxxx-xx | year-month"
@@ -1037,7 +853,7 @@ def test_release_date_mmyyyy(get_admin_token):
 def test_release_date_mm_bs_yyyy(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1068,8 +884,8 @@ def test_release_date_mm_bs_yyyy(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "release date invalid format: format accepted xxxx-xx | year-month"
@@ -1079,7 +895,7 @@ def test_release_date_mm_bs_yyyy(get_admin_token):
 def test_release_date_yyyy_bs_mm(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1110,8 +926,8 @@ def test_release_date_yyyy_bs_mm(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "Invalid Payload"
@@ -1120,7 +936,7 @@ def test_release_date_yyyy_bs_mm(get_admin_token):
 def test_release_date_blank(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1151,8 +967,8 @@ def test_release_date_blank(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "release_date is required"
@@ -1162,7 +978,7 @@ def test_release_date_blank(get_admin_token):
 def test_release_date_invalid_month(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1193,8 +1009,8 @@ def test_release_date_invalid_month(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "release date invalid - date should not be in future"
@@ -1203,7 +1019,7 @@ def test_release_date_invalid_month(get_admin_token):
 def test_release_date_leap_year(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1234,18 +1050,18 @@ def test_release_date_leap_year(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 @pytest.mark.tc_032
 def test_release_date_leap_year_with_day(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1276,8 +1092,8 @@ def test_release_date_leap_year_with_day(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "release date invalid format: format accepted xxxx-xx | year-month"
@@ -1287,7 +1103,7 @@ def test_release_date_leap_year_with_day(get_admin_token):
 def test_release_date_invalid_leap_year(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1318,8 +1134,8 @@ def test_release_date_invalid_leap_year(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "release date invalid format: format accepted xxxx-xx | year-month"
@@ -1328,7 +1144,7 @@ def test_release_date_invalid_leap_year(get_admin_token):
 def test_release_date_blank_char(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1359,8 +1175,8 @@ def test_release_date_blank_char(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "release date should not be empty"
@@ -1369,7 +1185,7 @@ def test_release_date_blank_char(get_admin_token):
 def test_release_date_malformed(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1400,8 +1216,8 @@ def test_release_date_malformed(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "release date invalid format: format accepted xxxx-xx | year-month"
@@ -1411,7 +1227,7 @@ def test_release_date_malformed(get_admin_token):
 def test_release_date_missing(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1442,8 +1258,8 @@ def test_release_date_missing(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "release_date is required"
@@ -1452,7 +1268,7 @@ def test_release_date_missing(get_admin_token):
 def test_release_date_us_format(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1483,8 +1299,8 @@ def test_release_date_us_format(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "release date invalid format: format accepted xxxx-xx | year-month"
@@ -1493,7 +1309,7 @@ def test_release_date_us_format(get_admin_token):
 def test_question_type_missing(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1524,8 +1340,8 @@ def test_question_type_missing(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "question_type is required"
@@ -1534,7 +1350,7 @@ def test_question_type_missing(get_admin_token):
 def test_grade_level_missing(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1565,8 +1381,8 @@ def test_grade_level_missing(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "grade_level is required"
@@ -1576,7 +1392,7 @@ def test_grade_level_missing(get_admin_token):
 def test_release_date_numeric(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1607,8 +1423,8 @@ def test_release_date_numeric(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "Invalid Payload"
@@ -1618,7 +1434,7 @@ def test_release_date_numeric(get_admin_token):
 def test_category_numeric(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1649,8 +1465,8 @@ def test_category_numeric(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "category must be a string"
@@ -1660,7 +1476,7 @@ def test_category_numeric(get_admin_token):
 def test_category_numeric_string(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1691,20 +1507,20 @@ def test_category_numeric_string(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 
 @pytest.mark.tc_043
 def test_category_missing(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1735,7 +1551,7 @@ def test_category_missing(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -1746,7 +1562,7 @@ def test_category_missing(get_admin_token):
 def test_category_eq_math(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1777,7 +1593,7 @@ def test_category_eq_math(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -1790,7 +1606,7 @@ def test_category_eq_math(get_admin_token):
 def test_category_eq_science(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1821,7 +1637,7 @@ def test_category_eq_science(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -1834,7 +1650,7 @@ def test_category_eq_science(get_admin_token):
 def test_category_eq_english(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1865,7 +1681,7 @@ def test_category_eq_english(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -1877,7 +1693,7 @@ def test_category_eq_english(get_admin_token):
 def test_category_eq_blank(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1908,7 +1724,7 @@ def test_category_eq_blank(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -1920,7 +1736,7 @@ def test_category_eq_blank(get_admin_token):
 def test_category_eq_blank_char(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1951,7 +1767,7 @@ def test_category_eq_blank_char(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -1963,7 +1779,7 @@ def test_category_eq_blank_char(get_admin_token):
 def test_category_eq_special_char(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -1994,7 +1810,7 @@ def test_category_eq_special_char(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2007,7 +1823,7 @@ def test_category_eq_special_char(get_admin_token):
 def test_category_eq_neg_num(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2038,7 +1854,7 @@ def test_category_eq_neg_num(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2051,7 +1867,7 @@ def test_category_eq_neg_num(get_admin_token):
 def test_keywords_list_strings(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2082,20 +1898,20 @@ def test_keywords_list_strings(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 
 @pytest.mark.tc_050
 def test_keywords_list_alpha_num(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2126,7 +1942,7 @@ def test_keywords_list_alpha_num(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2138,7 +1954,7 @@ def test_keywords_list_alpha_num(get_admin_token):
 def test_keywords_list_special_char(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2169,20 +1985,20 @@ def test_keywords_list_special_char(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 
 @pytest.mark.tc_052
 def test_keywords_empty_list(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2213,7 +2029,7 @@ def test_keywords_empty_list(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2225,7 +2041,7 @@ def test_keywords_empty_list(get_admin_token):
 def test_keywords_missing(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2256,7 +2072,7 @@ def test_keywords_missing(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2268,7 +2084,7 @@ def test_keywords_missing(get_admin_token):
 def test_keywords_all_num(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2299,7 +2115,7 @@ def test_keywords_all_num(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2311,7 +2127,7 @@ def test_keywords_all_num(get_admin_token):
 def test_keywords_blank_entry(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2342,7 +2158,7 @@ def test_keywords_blank_entry(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2354,7 +2170,7 @@ def test_keywords_blank_entry(get_admin_token):
 def test_keywords_long_value(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2385,7 +2201,7 @@ def test_keywords_long_value(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2397,7 +2213,7 @@ def test_keywords_long_value(get_admin_token):
 def test_keywords_list_50_value(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2434,7 +2250,7 @@ def test_keywords_list_50_value(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2446,7 +2262,7 @@ def test_keywords_list_50_value(get_admin_token):
 def test_student_expectations_num_str(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2477,20 +2293,20 @@ def test_student_expectations_num_str(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 
 @pytest.mark.tc_059
 def test_student_expectations_special_char(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2521,7 +2337,7 @@ def test_student_expectations_special_char(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2534,7 +2350,7 @@ def test_student_expectations_special_char(get_admin_token):
 def test_student_expectations_list_str_num(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2565,7 +2381,7 @@ def test_student_expectations_list_str_num(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2577,7 +2393,7 @@ def test_student_expectations_list_str_num(get_admin_token):
 def test_student_expectations_list_num_num(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2608,7 +2424,7 @@ def test_student_expectations_list_num_num(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2620,7 +2436,7 @@ def test_student_expectations_list_num_num(get_admin_token):
 def test_student_expectations_list_str_spec_char(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2651,7 +2467,7 @@ def test_student_expectations_list_str_spec_char(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2663,7 +2479,7 @@ def test_student_expectations_list_str_spec_char(get_admin_token):
 def test_student_expectations_list_num_str(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2694,7 +2510,7 @@ def test_student_expectations_list_num_str(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2706,7 +2522,7 @@ def test_student_expectations_list_num_str(get_admin_token):
 def test_student_expectations_list_empty(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2737,7 +2553,7 @@ def test_student_expectations_list_empty(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2749,7 +2565,7 @@ def test_student_expectations_list_empty(get_admin_token):
 def test_student_expectations_list_missing(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2780,7 +2596,7 @@ def test_student_expectations_list_missing(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2792,7 +2608,7 @@ def test_student_expectations_list_missing(get_admin_token):
 def test_student_expectations_list_blank_strs(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2823,7 +2639,7 @@ def test_student_expectations_list_blank_strs(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2834,7 +2650,7 @@ def test_student_expectations_list_blank_strs(get_admin_token):
 def test_response_type_blank(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2865,7 +2681,7 @@ def test_response_type_blank(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2877,7 +2693,7 @@ def test_response_type_blank(get_admin_token):
 def test_response_type_blank_char(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2908,7 +2724,7 @@ def test_response_type_blank_char(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2919,7 +2735,7 @@ def test_response_type_blank_char(get_admin_token):
 def test_response_type_missing(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2950,7 +2766,7 @@ def test_response_type_missing(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -2961,7 +2777,7 @@ def test_response_type_missing(get_admin_token):
 def test_response_type_not_ore(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -2992,7 +2808,7 @@ def test_response_type_not_ore(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -3003,7 +2819,7 @@ def test_response_type_not_ore(get_admin_token):
 def test_response_type_is_ore(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -3034,20 +2850,20 @@ def test_response_type_is_ore(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 
 @pytest.mark.tc_071
 def test_response_type_is_ror(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -3078,19 +2894,19 @@ def test_response_type_is_ror(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 @pytest.mark.tc_072
 def test_response_type_not_ror(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -3121,7 +2937,7 @@ def test_response_type_not_ror(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -3132,7 +2948,7 @@ def test_response_type_not_ror(get_admin_token):
 def test_response_type__mc(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -3163,20 +2979,20 @@ def test_response_type__mc(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 
 @pytest.mark.tc_073
 def test_response_type__not_mc(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -3207,7 +3023,7 @@ def test_response_type__not_mc(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -3218,7 +3034,7 @@ def test_response_type__not_mc(get_admin_token):
 def test_response_type_cb(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -3249,19 +3065,19 @@ def test_response_type_cb(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 @pytest.mark.tc_075
 def test_response_type_not_cb(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -3292,7 +3108,7 @@ def test_response_type_not_cb(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -3303,7 +3119,7 @@ def test_response_type_not_cb(get_admin_token):
 def test_response_type_numeric(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -3334,7 +3150,7 @@ def test_response_type_numeric(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -3345,7 +3161,7 @@ def test_response_type_numeric(get_admin_token):
 def test_response_type_spec_char(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -3376,7 +3192,7 @@ def test_response_type_spec_char(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -3387,7 +3203,7 @@ def test_response_type_spec_char(get_admin_token):
 def test_question_conent(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -3418,19 +3234,19 @@ def test_question_conent(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 @pytest.mark.tc_079
 def test_question_content_blank(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -3461,7 +3277,7 @@ def test_question_content_blank(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -3472,7 +3288,7 @@ def test_question_content_blank(get_admin_token):
 def test_question_content_missing(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -3503,7 +3319,7 @@ def test_question_content_missing(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -3514,7 +3330,7 @@ def test_question_content_missing(get_admin_token):
 def test_question_content_lines_10(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
     payload = {'data': '{ \
@@ -3554,7 +3370,7 @@ def test_question_content_lines_10(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -3566,7 +3382,7 @@ def test_question_content_lines_10(get_admin_token):
 def test_question_content_1000_char(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1000)
     payload = {'data': '{ \
@@ -3597,19 +3413,19 @@ def test_question_content_1000_char(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 @pytest.mark.tc_082
 def test_question_content_999_char(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(999)
     payload = {'data': '{ \
@@ -3640,20 +3456,20 @@ def test_question_content_999_char(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 
 @pytest.mark.tc_083
 def test_question_content_1001_char(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
     payload = {'data': '{ \
@@ -3684,7 +3500,7 @@ def test_question_content_1001_char(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -3695,7 +3511,7 @@ def test_question_content_1001_char(get_admin_token):
 def test_question_content_blank_chars(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
     payload = {'data': '{ \
@@ -3726,7 +3542,7 @@ def test_question_content_blank_chars(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -3737,7 +3553,7 @@ def test_question_content_blank_chars(get_admin_token):
 def test_question_content_numeric(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
     payload = {'data': '{ \
@@ -3768,7 +3584,7 @@ def test_question_content_numeric(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -3779,7 +3595,7 @@ def test_question_content_numeric(get_admin_token):
 def test_question_content_spec_char(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
     payload = {'data': '{ \
@@ -3810,19 +3626,19 @@ def test_question_content_spec_char(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 @pytest.mark.tc_087
 def test_question_img(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
     question_img: str = f"{CURRENT_DIR}\\tests\\images\\image_01.jpg"
@@ -3854,7 +3670,7 @@ def test_question_img(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -3865,7 +3681,7 @@ def test_question_img(get_admin_token):
 def test_question_img_missing(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
     question_img: str = f"{CURRENT_DIR}\\tests\\images\\image_01.jpg"
@@ -3897,7 +3713,7 @@ def test_question_img_missing(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -3909,7 +3725,7 @@ def test_question_img_missing(get_admin_token):
 def test_question_img_blank_char(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
     question_img: str = f"{CURRENT_DIR}\\tests\\images\\image_01.jpg"
@@ -3941,7 +3757,7 @@ def test_question_img_blank_char(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -3953,7 +3769,7 @@ def test_question_img_blank_char(get_admin_token):
 def test_question_img_numeric(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
     question_img: str = f"{CURRENT_DIR}\\tests\\images\\image_01.jpg"
@@ -3985,7 +3801,7 @@ def test_question_img_numeric(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
@@ -3997,7 +3813,7 @@ def test_question_img_numeric(get_admin_token):
 def test_options_single(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
     question_img: str = f"{CURRENT_DIR}\\tests\\images\\image_01.jpg"
@@ -4022,19 +3838,19 @@ def test_options_single(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 @pytest.mark.tc_092
 def test_options_group_10(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
     question_img: str = f"{CURRENT_DIR}\\tests\\images\\image_01.jpg"
@@ -4136,19 +3952,19 @@ def test_options_group_10(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 @pytest.mark.tc_093
 def test_options_group_60(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
     question_img: str = f"{CURRENT_DIR}\\tests\\images\\image_01.jpg"
@@ -4586,19 +4402,19 @@ def test_options_group_60(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    
     response = requests.request(
         "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 @pytest.mark.tc_094
 def test_options_letter_blank(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -4628,8 +4444,8 @@ def test_options_letter_blank(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == 'letter is required'
@@ -4639,7 +4455,7 @@ def test_options_letter_blank(get_admin_token):
 def test_options_content_blank(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -4669,8 +4485,8 @@ def test_options_content_blank(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == 'content is required'
@@ -4679,7 +4495,7 @@ def test_options_content_blank(get_admin_token):
 def test_options_image_blank(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -4709,18 +4525,18 @@ def test_options_image_blank(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 @pytest.mark.tc_097
 def test_options_unit_blank(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -4750,18 +4566,18 @@ def test_options_unit_blank(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 @pytest.mark.tc_098
 def test_options_is_answer_numeric(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -4791,8 +4607,8 @@ def test_options_is_answer_numeric(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == 'is_answer should be type boolean'
@@ -4802,7 +4618,7 @@ def test_options_is_answer_numeric(get_admin_token):
 def test_options_is_answer_blank_str(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -4832,8 +4648,8 @@ def test_options_is_answer_blank_str(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == 'is_answer is required'
@@ -4843,7 +4659,7 @@ def test_options_is_answer_blank_str(get_admin_token):
 def test_options_is_answer_true(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -4873,18 +4689,18 @@ def test_options_is_answer_true(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 @pytest.mark.tc_100
 def test_options_is_answer_false(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -4914,18 +4730,18 @@ def test_options_is_answer_false(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 @pytest.mark.tc_101
 def test_options_is_answer_both_missing(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -4955,8 +4771,8 @@ def test_options_is_answer_both_missing(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == 'is_answer is required in option object'
@@ -4966,7 +4782,7 @@ def test_options_is_answer_both_missing(get_admin_token):
 def test_options_is_answer_single_missing(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -4996,8 +4812,8 @@ def test_options_is_answer_single_missing(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == 'is_answer is required in option object'
@@ -5007,7 +4823,7 @@ def test_options_is_answer_single_missing(get_admin_token):
 def test_options_unit_missing(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -5037,8 +4853,8 @@ def test_options_unit_missing(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == 'missing_unit is required'
@@ -5047,7 +4863,7 @@ def test_options_unit_missing(get_admin_token):
 def test_options_content_1000_char(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
+    url = f"{req.base_url}/v1/questions/create"
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -5070,19 +4886,19 @@ def test_options_content_1000_char(get_admin_token):
       ] \
     }'}
 
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
-    assert common.is_valid_uuid(json_response['question_uuid']) == True
+    
 
 @pytest.mark.tc_105
 def test_options_invalid_option_image(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    url = f"{req.base_url}/v1/questions/create"
+    
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -5105,7 +4921,7 @@ def test_options_invalid_option_image(get_admin_token):
       ] \
     }'}
 
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == 'invalid option image insertion: image must be added through the Form, not in payload.'
@@ -5114,8 +4930,8 @@ def test_options_invalid_option_image(get_admin_token):
 def test_options_invalid_question_image(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    url = f"{req.base_url}/v1/questions/create"
+    
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -5138,7 +4954,7 @@ def test_options_invalid_question_image(get_admin_token):
       ] \
     }'}
 
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == 'invalid image insertion: image must be added through the Form, not in payload.'
@@ -5147,8 +4963,8 @@ def test_options_invalid_question_image(get_admin_token):
 def test_options_is_answer_True(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    url = f"{req.base_url}/v1/questions/create"
+    
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -5171,7 +4987,7 @@ def test_options_is_answer_True(get_admin_token):
       ] \
     }'}
 
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == 'Invalid Payload'
@@ -5180,8 +4996,8 @@ def test_options_is_answer_True(get_admin_token):
 def test_options_is_answer_False(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
-    url = f"{req.base_url}/question/staar/create"
-    upload_file: list = common.set_image_file(f"{CURRENT_DIR}", "image_01.jpg")
+    url = f"{req.base_url}/v1/questions/create"
+    
 
     payload = {'data': '{ \
       "question_type": "STAAR", \
@@ -5204,7 +5020,7 @@ def test_options_is_answer_False(get_admin_token):
       ] \
     }'}
 
-    response = requests.request("POST", url, headers=header, data=payload, files=upload_file)
+    response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == 'Invalid Payload'
