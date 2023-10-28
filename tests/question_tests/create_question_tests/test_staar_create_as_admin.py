@@ -42,9 +42,35 @@ def test_blank_question_type(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['question_type'] = ""
+    payload = {'data': '{ \
+      "question_type": "", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
 
+    
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
@@ -57,13 +83,39 @@ def test_question_type_numeric(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['question_type'] = "1"
+    payload = {'data': '{ \
+      "question_type": 1, \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] == "invalid question type"
+    assert json_response['detail'] == "question_type must be a string"
 
 
 @pytest.mark.tc_007
@@ -72,10 +124,35 @@ def test_grade_level_eq_0(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['grade_level'] = 0
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 0, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
 
-
+    
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
@@ -83,18 +160,43 @@ def test_grade_level_eq_0(get_admin_token):
 
 @pytest.mark.tc_008
 def test_grade_level_eq_13(get_admin_token):
-  req = Requester()
-  header: dict = req.create_basic_headers(token=get_admin_token)
-  url = f"{req.base_url}/v1/questions/create"
+    req = Requester()
+    header: dict = req.create_basic_headers(token=get_admin_token)
+    url = f"{req.base_url}/v1/questions/create"
 
-  payload = get_valid_successful_staar_payload()
-  payload['grade_level'] = 13
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 13, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
 
     
-  response = requests.request("POST", url, headers=header, json=payload)
-  json_response = json.loads(response.text)
-  assert response.status_code == 400
-  assert json_response['detail'] == "invalid grade level: should only be between 3 to 12"
+    response = requests.request("POST", url, headers=header, json=payload)
+    json_response = json.loads(response.text)
+    assert response.status_code == 400
+    assert json_response['detail'] == "invalid grade level: should only be between 3 to 12"
 
 @pytest.mark.tc_009
 def test_grade_level_eq_12(get_admin_token):
@@ -102,8 +204,34 @@ def test_grade_level_eq_12(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['grade_level'] = 12
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 12, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -117,8 +245,34 @@ def test_grade_level_eq_neg_3(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['grade_level'] = -3
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": -3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -131,8 +285,34 @@ def test_grade_level_eq_neg_12(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['grade_level'] = -12
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": -12, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -146,8 +326,34 @@ def test_grade_level_eq_neg_13(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['grade_level'] = -13
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": -13, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -160,8 +366,34 @@ def test_grade_level_eq_neg_0(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['grade_level'] = -0
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": -0, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -174,8 +406,34 @@ def test_grade_level_str_3(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['grade_level'] = "3"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": "3", \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -188,8 +446,34 @@ def test_grade_level_str_12(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['grade_level'] = "12"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": "12", \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -202,13 +486,39 @@ def test_grade_level_blank(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    del payload['grade_level']
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": , \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] == "grade_level is required"
+    assert json_response['detail'] == "Invalid Payload"
 
 @pytest.mark.tc_020
 def test_grade_level_eq_1(get_admin_token):
@@ -216,8 +526,34 @@ def test_grade_level_eq_1(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['grade_level'] = 1
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 1, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     assert response.status_code == 400
@@ -229,13 +565,39 @@ def test_grade_level_special_char(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['grade_level'] = '@'
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": @, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] == 'grade level must be an integer'
+    assert json_response['detail'] == 'Invalid Payload'
 
 @pytest.mark.tc_022
 def test_grade_level_blank_str(get_admin_token):
@@ -243,8 +605,34 @@ def test_grade_level_blank_str(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['grade_level'] = ''
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": "", \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -258,8 +646,34 @@ def test_release_date_current(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_current_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['release_date'] = f"{f'{yyyy_mm}'}"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "' + yyyy_mm + '", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -275,8 +689,34 @@ def test_release_date_future(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_future_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['release_date'] = f"{f'{yyyy_mm}'}"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "' + yyyy_mm + '", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -291,8 +731,34 @@ def test_release_date_past(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['release_date'] = f"{f'{yyyy_mm}'}"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "' + yyyy_mm + '", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -308,8 +774,34 @@ def test_release_date_mm_yyyy(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['release_date'] = "03-2024"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "03-2024", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -323,8 +815,34 @@ def test_release_date_mmyyyy(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['release_date'] = "032024"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "032024", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -338,8 +856,34 @@ def test_release_date_mm_bs_yyyy(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['release_date'] = "03/2024"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "03\2024", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -354,13 +898,39 @@ def test_release_date_yyyy_bs_mm(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['release_date'] = "2023\03"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2023\03", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] == "release date invalid format: format accepted xxxx-xx | year-month"
+    assert json_response['detail'] == "Invalid Payload"
 
 @pytest.mark.tc_029
 def test_release_date_blank(get_admin_token):
@@ -369,8 +939,34 @@ def test_release_date_blank(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['release_date'] = ""
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -385,8 +981,34 @@ def test_release_date_invalid_month(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['release_date'] = "2024-15"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-15", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -400,8 +1022,34 @@ def test_release_date_leap_year(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['release_date'] = "2024-02"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -416,8 +1064,34 @@ def test_release_date_leap_year_with_day(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['release_date'] = "2024-31-02"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-31-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -432,8 +1106,34 @@ def test_release_date_invalid_leap_year(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['release_date'] = "2023-31-02"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2023-31-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -447,8 +1147,34 @@ def test_release_date_blank_char(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['release_date'] = "   "
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "   ", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -462,8 +1188,34 @@ def test_release_date_malformed(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['release_date'] = "00000000000"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "00000000000", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -477,9 +1229,35 @@ def test_release_date_missing(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
-    
-    payload = get_valid_successful_staar_payload()
-    del payload['release_date']
+
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "somthing else": "00000000000", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -493,8 +1271,34 @@ def test_release_date_us_format(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['release_date'] = '03-12-2024'
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "03-12-2024", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -508,8 +1312,34 @@ def test_question_type_missing(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    del payload['question_type']
+    payload = {'data': '{ \
+      "something_else": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -523,8 +1353,33 @@ def test_grade_level_missing(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    del payload['grade_level']
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "something": 3, \
+      "release_date": "2024-03", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
 
     
     response = requests.request("POST", url, headers=header, json=payload)
@@ -540,13 +1395,39 @@ def test_release_date_numeric(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['release_date'] = 202403
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": 2024-03, \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] == "release date must be a string"
+    assert json_response['detail'] == "Invalid Payload"
 
 # category
 @pytest.mark.tc_041
@@ -556,8 +1437,34 @@ def test_category_numeric(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['category'] = 1
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": 1, \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -572,11 +1479,37 @@ def test_category_numeric_string(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['category'] = "1"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.2(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
@@ -590,11 +1523,37 @@ def test_category_missing(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    del payload['category']
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "something else": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.2(B)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "category is required"
@@ -606,11 +1565,37 @@ def test_category_eq_math(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['category'] = "math"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "math", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"],\
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "Valid category is from 1 to 5"
@@ -624,11 +1609,37 @@ def test_category_eq_science(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['category'] = "science"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "science", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.2(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "Valid category is from 1 to 5"
@@ -642,11 +1653,37 @@ def test_category_eq_english(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['category'] = "english"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "english", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(B)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "Valid category is from 1 to 5"
@@ -659,11 +1696,37 @@ def test_category_eq_blank(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['category'] = ""
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.2(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "category is required"
@@ -676,11 +1739,37 @@ def test_category_eq_blank_char(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['category'] = "  "
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "  ", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(B)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "category should not be empty"
@@ -693,11 +1782,37 @@ def test_category_eq_special_char(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['category'] = "!@#$%^*(*(*))"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "!@#$%^*(*(*))", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "Valid category is from 1 to 5"
@@ -711,11 +1826,37 @@ def test_category_eq_neg_num(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['category'] = "-13232"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "-13232", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(B)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "Valid category is from 1 to 5"
@@ -729,11 +1870,37 @@ def test_keywords_list_strings(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['keywords'] = ["math","algebra", "science", "english", "writing", "reading"]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "2", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": ["A.2(B)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
@@ -747,11 +1914,37 @@ def test_keywords_list_alpha_num(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['keywords'] = ["math","algebra", "science",3, "english", "writing", "reading", 5]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "2", \
+      "keywords": ["math","algebra", "science",3, "english", "writing", "reading", 5], \
+      "student_expectations": ["A.2(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "all values in keywords must be string"
@@ -764,11 +1957,37 @@ def test_keywords_list_special_char(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['keywords'] = ["math","algebra", "science","@@", "english", "writing", "reading", "#@#@"]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "1", \
+      "keywords": ["math","algebra", "science","@@", "english", "writing", "reading", "#@#@"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
@@ -782,11 +2001,37 @@ def test_keywords_empty_list(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['keywords'] = []
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "2", \
+      "keywords": [], \
+      "student_expectations": ["A.1(B)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "keywords must not be empty"
@@ -799,11 +2044,37 @@ def test_keywords_missing(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    del payload['keywords']
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "2", \
+      "keyword_missing": ["math", "english"], \
+      "student_expectations": ["A.2(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "keywords is required"
@@ -816,11 +2087,37 @@ def test_keywords_all_num(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['keywords'] = [3, 1, 5, 4, 8, 9]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "2", \
+      "keywords": [3, 1, 5, 4, 8, 9], \
+      "student_expectations": ["A.2(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "all values in keywords must be string"
@@ -833,11 +2130,37 @@ def test_keywords_blank_entry(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['keywords'] = ["math", "science", "english", "", "algegra", "geometry"]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "3", \
+      "keywords": ["math", "science", "english", "", "algegra", "geometry"], \
+      "student_expectations": ["A.2(B)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "a value in keywords should not be an empty string"
@@ -850,14 +2173,40 @@ def test_keywords_long_value(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['keywords'] = ["math_algebra_math_algebra_math_algebra_math_algebra_math_algebra_math_algebra_math_algebra_math_algebra_math_algebra_math_algebra",]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "2", \
+      "keywords": ["math_algebra_math_algebra_math_algebra_math_algebra_math_algebra_math_algebra_math_algebra_math_algebra_math_algebra_math_algebra",], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] == "Max length of keyword reached"
+    assert json_response['detail'] == "Invalid Payload"
 
 
 @pytest.mark.tc_057
@@ -867,20 +2216,46 @@ def test_keywords_list_50_value(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['keywords'] = ["Math","Math","Math","Math","Math","Math",
-        "Math","Math","Math","Math","Math","Math","Math","Math",
-        "Math","Math","Math","Math","Math","Math","Math","Math",
-        "Math","Math","Math","Math","Math","Math","Math","Math",
-        "Math","Math","Math","Math","Math","Math","Math","Math",
-        "Math","Math","Math","Math","Math","Math","Math","Math",
-        "Math","Math","Math","Math",]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "3", \
+      "keywords": ["Math","Math","Math","Math","Math","Math",\
+        "Math","Math","Math","Math","Math","Math","Math","Math",\
+        "Math","Math","Math","Math","Math","Math","Math","Math",\
+        "Math","Math","Math","Math","Math","Math","Math","Math",\
+        "Math","Math","Math","Math","Math","Math","Math","Math",\
+        "Math","Math","Math","Math","Math","Math","Math","Math",\
+        "Math","Math","Math","Math",], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] == "Max number of keywords reached"
+    assert json_response['detail'] == "Invalid Payload"
 
 
 @pytest.mark.tc_058
@@ -890,11 +2265,37 @@ def test_student_expectations_num_str(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['student_expectations'] = ["A.1(A)"]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "2", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
@@ -908,11 +2309,37 @@ def test_student_expectations_special_char(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['student_expectations'] = ["@"]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "1", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": ["@"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "Invalid student expectations"
@@ -926,11 +2353,37 @@ def test_student_expectations_list_str_num(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['student_expectations'] = ["31", "2.1", "3.3"]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "2", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": ["31", "2.1", "3.3"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "Invalid student expectations"
@@ -943,11 +2396,37 @@ def test_student_expectations_list_num_num(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['student_expectations'] = [31, 2.1]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "2", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": [31, 2.1], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "student_expectations must be a string"
@@ -960,14 +2439,40 @@ def test_student_expectations_list_str_spec_char(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['student_expectations'] = ["31", '@']
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "3", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": ["31", @], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] == "Invalid student expectations"
+    assert json_response['detail'] == "Invalid Payload"
 
 
 @pytest.mark.tc_063
@@ -977,11 +2482,37 @@ def test_student_expectations_list_num_str(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['student_expectations'] = [31, "2.1"]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "2", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": [31, "2.1"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "student_expectations must be a string"
@@ -994,11 +2525,37 @@ def test_student_expectations_list_empty(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['student_expectations'] = []
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "2", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": [], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "student_expectations must not be empty"
@@ -1011,11 +2568,37 @@ def test_student_expectations_list_missing(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    del payload['student_expectations']
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "2", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "missing_student_expectations": ["2.1", "2.3", "4.5"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "student_expectations is required"
@@ -1028,11 +2611,37 @@ def test_student_expectations_list_blank_strs(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['student_expectations'] = ["", "", ""]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "1", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": ["", "", ""], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "student_expectations should not be an empty string"
@@ -1044,11 +2653,37 @@ def test_response_type_blank(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['response_type'] = ""
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "1", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": ["A.1(A)", "A.2(B)", "A.3(A)"], \
+      "response_type": "", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "response_type is required"
@@ -1061,14 +2696,40 @@ def test_response_type_blank_char(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['response_type'] = "  "
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "2", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": ["A.1(A)", "A.2(B)", "A.3(C)"], \
+      "response_type": "", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] == "response_type should not be an empty string"
+    assert json_response['detail'] == "response_type is required"
 
 @pytest.mark.tc_069
 def test_response_type_missing(get_admin_token):
@@ -1077,11 +2738,37 @@ def test_response_type_missing(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    del payload['response_type']
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "2", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": ["A.1(A)", "A.2(A)", "A.3(B)"], \
+      "missing_response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "response_type is required"
@@ -1093,11 +2780,37 @@ def test_response_type_not_ore(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['response_type'] = "Open Response"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "2", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": ["A.1(A)", "A.3(A)", "A.2(B)"], \
+      "response_type": "Open Response", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "invalid response type"
@@ -1109,11 +2822,37 @@ def test_response_type_is_ore(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['response_type'] = "Open Response Exact"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "2", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": ["A.2(A)", "A.2(B)", "A.3(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
@@ -1127,11 +2866,37 @@ def test_response_type_is_ror(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['response_type'] = "Range Open Response"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "1", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": ["A.1(A)", "A.2(B)", "A.3(A)"], \
+      "response_type": "Range Open Response", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
@@ -1144,11 +2909,37 @@ def test_response_type_not_ror(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['response_type'] = "Range Open"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "1", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": ["A.1(A)", "A.1(B)", "A.2(A)"], \
+      "response_type": "Range Open", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "invalid response type"
@@ -1160,11 +2951,37 @@ def test_response_type__mc(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['response_type'] = "Multiple Choice"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "1", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": ["A.1(A)", "A.1(B)", "A.2(A)"], \
+      "response_type": "Multiple Choice", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
@@ -1178,11 +2995,37 @@ def test_response_type__not_mc(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['response_type'] = "Multiple"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "1", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": ["A.1(A)", "A.2(B)", "A.1(C)"], \
+      "response_type": "Multiple", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "invalid response type"
@@ -1194,11 +3037,37 @@ def test_response_type_cb(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['response_type'] = "Checkbox"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "2", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": ["A.1(A)", "A.2(A)", "A.3(A)"], \
+      "response_type": "Checkbox", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
@@ -1211,11 +3080,37 @@ def test_response_type_not_cb(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['response_type'] = "Check box"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "5", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": ["A.1(B)", "A.1(C)", "A.2(B)"], \
+      "response_type": "Check box", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "invalid response type"
@@ -1227,11 +3122,37 @@ def test_response_type_numeric(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['response_type'] = 1
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "3", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": ["A.1(A)", "A.1(B)", "A.2(A)"], \
+      "response_type": 1, \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "response_type must be a string"
@@ -1243,27 +3164,79 @@ def test_response_type_spec_char(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['response_type'] = "@@@@@"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-03", \
+      "category": "3", \
+      "keywords": ["math","algebra", "science", "english", "writing", "reading"], \
+      "student_expectations": ["A.1(A)", "A.2(B)", "A.3(A)"], \
+      "response_type": "@@@@@", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "invalid response type"
 
 @pytest.mark.tc_078
-def test_question_content(get_admin_token):
+def test_question_conent(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['question_content'] = "this is a test"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "2", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.2(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
@@ -1276,11 +3249,37 @@ def test_question_content_blank(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['question_content'] = ""
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "2", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "question_content is required"
@@ -1292,11 +3291,37 @@ def test_question_content_missing(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    del payload['question_content']
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "2", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "missing_question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "question_content is required"
@@ -1308,20 +3333,46 @@ def test_question_content_lines_10(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
 
-    payload = get_valid_successful_staar_payload()
-    payload['question_content'] = """This is a long string to provide a paragraph just to test if question content has a limit \
-               This is a long string to provide a paragraph just to test if question content has a limit 
-               This is a long string to provide a paragraph just to test if question content has a limit 
-               This is a long string to provide a paragraph just to test if question content has a limit 
-               This is a long string to provide a paragraph just to test if question content has a limit 
-               This is a long string to provide a paragraph just to test if question content has a limit 
-               This is a long string to provide a paragraph just to test if question content has a limit 
-               This is a long string to provide a paragraph just to test if question content has a limit 
-               This is a long string to provide a paragraph just to test if question content has a limit 
-               This is a long string to provide a paragraph just to test if question content has a limit"""
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "2", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.2(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "This is a long string to provide a paragraph just to test if qustion content has a limit \
+               This is a long string to provide a paragraph just to test if qustion content has a limit \
+               This is a long string to provide a paragraph just to test if qustion content has a limit \
+               This is a long string to provide a paragraph just to test if qustion content has a limit \
+               This is a long string to provide a paragraph just to test if qustion content has a limit \
+               This is a long string to provide a paragraph just to test if qustion content has a limit \
+               This is a long string to provide a paragraph just to test if qustion content has a limit \
+               This is a long string to provide a paragraph just to test if qustion content has a limit \
+               This is a long string to provide a paragraph just to test if qustion content has a limit \
+               This is a long string to provide a paragraph just to test if qustion content has a limit", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == 'question content should not exceed 1000 characters'
@@ -1334,11 +3385,37 @@ def test_question_content_1000_char(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1000)
-    payload = get_valid_successful_staar_payload()
-    payload['question_content'] = f"{f'{char_limit}'}"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.2(B)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "' + char_limit + '", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
@@ -1351,11 +3428,37 @@ def test_question_content_999_char(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(999)
-    payload = get_valid_successful_staar_payload()
-    payload['question_content'] = f"{f'{char_limit}'}"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "3", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "' + char_limit + '", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
@@ -1369,11 +3472,37 @@ def test_question_content_1001_char(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
-    payload = get_valid_successful_staar_payload()
-    payload['question_content'] = f"{f'{char_limit}'}"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "' + char_limit + '", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == "question content should not exceed 1000 characters"
@@ -1385,12 +3514,37 @@ def test_question_content_blank_chars(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
-    
-    payload = get_valid_successful_staar_payload()
-    payload['question_content'] = "   "
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "2", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(B)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "   ", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == 'question content should not be empty'
@@ -1402,12 +3556,37 @@ def test_question_content_numeric(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
-    
-    payload = get_valid_successful_staar_payload()
-    payload['question_content'] = 5
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": 5, \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == 'question content must be a string'
@@ -1419,11 +3598,37 @@ def test_question_content_spec_char(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
-    payload = get_valid_successful_staar_payload()
-    payload['question_content'] = "!#$!@#$@#f"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "3", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.2(B)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "!#$!@#$@#f", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
@@ -1437,15 +3642,40 @@ def test_question_img(get_admin_token):
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
     question_img: str = f"{CURRENT_DIR}\\tests\\images\\image_01.jpg"
-    
-    payload = get_valid_successful_staar_payload()
-    payload['question_img'] = f"{f'{question_img}'}"
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "3", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.2(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "' + question_img + '", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] == 'invalid image insertion: image must be added through the Form, not in payload.'
+    assert json_response['detail'] == 'Invalid Payload'
 
 @pytest.mark.tc_088
 def test_question_img_missing(get_admin_token):
@@ -1455,15 +3685,40 @@ def test_question_img_missing(get_admin_token):
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
     question_img: str = f"{CURRENT_DIR}\\tests\\images\\image_01.jpg"
-    
-    payload = get_valid_successful_staar_payload()
-    del payload['question_img']
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "missing_question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] == 'question_img is required'
+    assert json_response['detail'] == 'missing_question_img is required'
 
 
 @pytest.mark.tc_089
@@ -1474,12 +3729,37 @@ def test_question_img_blank_char(get_admin_token):
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
     question_img: str = f"{CURRENT_DIR}\\tests\\images\\image_01.jpg"
-    
-    payload = get_valid_successful_staar_payload()
-    payload['question_img'] = "   "
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "3", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.2(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "   ", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == 'invalid image insertion: image must be added through the Form, not in payload.'
@@ -1493,11 +3773,37 @@ def test_question_img_numeric(get_admin_token):
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
     question_img: str = f"{CURRENT_DIR}\\tests\\images\\image_01.jpg"
-    payload = get_valid_successful_staar_payload()
-    payload['question_img'] = 1
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": 1, \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 400
     assert json_response['detail'] == 'image must be a string'
@@ -1511,18 +3817,30 @@ def test_options_single(get_admin_token):
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
     question_img: str = f"{CURRENT_DIR}\\tests\\images\\image_01.jpg"
-    payload = get_valid_successful_staar_payload()
-    payload['options'] = [ 
-        { 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True 
-        } 
-      ] 
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        } \
+      ] \
+    }'}
+
+    
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
@@ -1536,96 +3854,107 @@ def test_options_group_10(get_admin_token):
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
     question_img: str = f"{CURRENT_DIR}\\tests\\images\\image_01.jpg"
-    payload = get_valid_successful_staar_payload()
-    payload['options'] = [ 
-        { 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True 
-        }, 
-        { 
-          "letter": "b", 
-          "content": "option b", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": False 
-        }, 
-        { 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True 
-        }, 
-         { 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True 
-        }, 
-        { 
-          "letter": "b", 
-          "content": "option b", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": False 
-        }, 
-        { 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True 
-        }, 
-        { 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True 
-        }, 
-        { 
-          "letter": "b", 
-          "content": "option b", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True 
-        }, 
-        { 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True 
-        }, 
-         { 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True 
-        }, 
-        { 
-          "letter": "b", 
-          "content": "option b", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True 
-        }, 
-        { 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True 
-        } 
-      ]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+         { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+         { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
@@ -1639,24 +3968,443 @@ def test_options_group_60(get_admin_token):
     yyyy_mm: str = str(common.get_past_yyyy_mm())
     char_limit: str = common.get_random_char(1001)
     question_img: str = f"{CURRENT_DIR}\\tests\\images\\image_01.jpg"
-    
-    payload = get_valid_successful_staar_payload()
-    payload['options'] = [{ 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True 
-        }, { 
-          "letter": "b", 
-          "content": "option b", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": False 
-        }] * 30
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+         { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+         { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+         { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+         { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+         { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+         { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+         { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+         { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        },\
+         { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+         { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+         { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+         { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+         { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+         { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request(
-        "POST", url, headers=header, json=payload)
+        "POST", url, headers=header, data=payload, files=upload_file)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
@@ -1668,20 +4416,34 @@ def test_options_letter_blank(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['options'] = [{ 
-          "letter": "", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True 
-        }, { 
-          "letter": "b", 
-          "content": "option b", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": False 
-        }]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -1695,20 +4457,34 @@ def test_options_content_blank(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['options'] = [{ 
-          "letter": "a", 
-          "content": "", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True 
-        }, { 
-          "letter": "b", 
-          "content": "", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": False 
-        }]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "b", \
+          "content": "", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -1721,21 +4497,35 @@ def test_options_image_blank(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['options'] = [{ 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True 
-        }, { 
-          "letter": "b", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": False 
-        }]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "b", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
 
+    
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 201
@@ -1748,20 +4538,34 @@ def test_options_unit_blank(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['options'] = [{ 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "", 
-          "is_answer": True 
-        }, { 
-          "letter": "b", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": False 
-        }]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "b", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -1775,20 +4579,34 @@ def test_options_is_answer_numeric(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['options'] = [{ 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True 
-        }, { 
-          "letter": "b", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": 1 
-        }]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "b", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": 1 \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -1802,20 +4620,34 @@ def test_options_is_answer_blank_str(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['options'] = [{ 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": "" 
-        }, { 
-          "letter": "b", 
-          "content": "option b", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": "" 
-        }]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "b", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "", \
+          "is_answer": "" \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": "" \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
@@ -1829,20 +4661,33 @@ def test_options_is_answer_true(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['options'] = [{ 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True 
-        }, { 
-          "letter": "b", 
-          "content": "option b", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True
-        }]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "b", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "", \
+          "is_answer": true \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        } \
+      ] \
+    }'}
 
     
     response = requests.request("POST", url, headers=header, json=payload)
@@ -1857,20 +4702,33 @@ def test_options_is_answer_false(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['options'] = [{ 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": False 
-        }, { 
-          "letter": "b", 
-          "content": "option b", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": False
-        }]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "b", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
 
     
     response = requests.request("POST", url, headers=header, json=payload)
@@ -1885,18 +4743,33 @@ def test_options_is_answer_both_missing(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['options'] = [{ 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds"
-        }, { 
-          "letter": "b", 
-          "content": "option b", 
-          "image": "", 
-          "unit": "pounds"
-        }]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "b", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "", \
+          "missing_is_answer": false \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "missing_is_answer": false \
+        } \
+      ] \
+    }'}
 
     
     response = requests.request("POST", url, headers=header, json=payload)
@@ -1911,19 +4784,33 @@ def test_options_is_answer_single_missing(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['options'] = [{ 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": False
-        }, { 
-          "letter": "b", 
-          "content": "option b", 
-          "image": "", 
-          "unit": "pounds"
-        }]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "b", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "missing_is_answer": false \
+        } \
+      ] \
+    }'}
 
     
     response = requests.request("POST", url, headers=header, json=payload)
@@ -1938,23 +4825,39 @@ def test_options_unit_missing(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['options'] = [{ 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "is_answer": False
-        }, { 
-          "letter": "b", 
-          "content": "option b", 
-          "image": "", 
-          "is_answer": False
-        }]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "b", \
+          "content": "this is a test", \
+          "image": "", \
+          "missing_unit": "", \
+          "is_answer": false \
+        }, \
+        { \
+          "letter": "b", \
+          "content": "option b", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": false \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 400
-    assert json_response['detail'] == 'unit is required'
+    assert json_response['detail'] == 'missing_unit is required'
 
 @pytest.mark.tc_104
 def test_options_content_1000_char(get_admin_token):
@@ -1962,45 +4865,132 @@ def test_options_content_1000_char(get_admin_token):
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
 
-    payload = get_valid_successful_staar_payload()
-    payload['options'] = [{ 
-          "letter": "a", 
-          "content": f"{common.get_random_char(1000)}", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True 
-        }, { 
-          "letter": "b", 
-          "content": f"{common.get_random_char(1000)}", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True
-        }]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "' + common.get_random_char(1000) + '", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        } \
+      ] \
+    }'}
+
     
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
     assert response.status_code == 201
     assert json_response['detail'] == "Successfully Added Question"
     
+
+@pytest.mark.tc_105
+def test_options_invalid_option_image(get_admin_token):
+    req = Requester()
+    header: dict = req.create_basic_headers(token=get_admin_token)
+    url = f"{req.base_url}/v1/questions/create"
+    
+
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "' + common.get_random_char(1000) + '", \
+          "image": "' + str(upload_file) + '", \
+          "unit": "pounds", \
+          "is_answer": true \
+        } \
+      ] \
+    }'}
+
+    response = requests.request("POST", url, headers=header, json=payload)
+    json_response = json.loads(response.text)
+    assert response.status_code == 400
+    assert json_response['detail'] == 'invalid option image insertion: image must be added through the Form, not in payload.'
+
+@pytest.mark.tc_106
+def test_options_invalid_question_image(get_admin_token):
+    req = Requester()
+    header: dict = req.create_basic_headers(token=get_admin_token)
+    url = f"{req.base_url}/v1/questions/create"
+    
+
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "' + str(upload_file) + '", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "' + common.get_random_char(1000) + '", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": true \
+        } \
+      ] \
+    }'}
+
+    response = requests.request("POST", url, headers=header, json=payload)
+    json_response = json.loads(response.text)
+    assert response.status_code == 400
+    assert json_response['detail'] == 'invalid image insertion: image must be added through the Form, not in payload.'
+
 @pytest.mark.tc_107
 def test_options_is_answer_True(get_admin_token):
     req = Requester()
     header: dict = req.create_basic_headers(token=get_admin_token)
     url = f"{req.base_url}/v1/questions/create"
     
-    payload = get_valid_successful_staar_payload()
-    payload['options'] = [{ 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": True}]
-    
+
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": True \
+        } \
+      ] \
+    }'}
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
-    assert response.status_code == 201
-    assert json_response['detail'] == 'Successfully Added Question'
+    assert response.status_code == 400
+    assert json_response['detail'] == 'Invalid Payload'
 
 @pytest.mark.tc_108
 def test_options_is_answer_False(get_admin_token):
@@ -2009,15 +4999,28 @@ def test_options_is_answer_False(get_admin_token):
     url = f"{req.base_url}/v1/questions/create"
     
 
-    payload = get_valid_successful_staar_payload()
-    payload['options'] = [{ 
-          "letter": "a", 
-          "content": "this is a test", 
-          "image": "", 
-          "unit": "pounds", 
-          "is_answer": False}]
+    payload = {'data': '{ \
+      "question_type": "STAAR", \
+      "grade_level": 3, \
+      "release_date": "2024-02", \
+      "category": "1", \
+      "keywords": ["math"], \
+      "student_expectations": ["A.1(A)"], \
+      "response_type": "Open Response Exact", \
+      "question_content": "this is a test", \
+      "question_img": "", \
+      "options": [ \
+        { \
+          "letter": "a", \
+          "content": "this is a test", \
+          "image": "", \
+          "unit": "pounds", \
+          "is_answer": False \
+        } \
+      ] \
+    }'}
 
     response = requests.request("POST", url, headers=header, json=payload)
     json_response = json.loads(response.text)
-    assert response.status_code == 201
-    assert json_response['detail'] == 'Successfully Added Question'
+    assert response.status_code == 400
+    assert json_response['detail'] == 'Invalid Payload'

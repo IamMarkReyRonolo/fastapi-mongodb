@@ -18,32 +18,22 @@ from server.models.account import (
 
 
 def question_parser(question):
-    if 'question_type' not in question:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST,
-                                    detail="question_type is required")
-    elif 'question_img' not in question:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST,
-                                    detail="question_img is required")
-    elif not all('unit' in item for item in question['options']):
-        raise HTTPException(status.HTTP_400_BAD_REQUEST,
-                                    detail="unit is required")
+    question_type = question['question_type'].strip()
+    
+    if question_type.upper() == 'STAAR':
+        question = StaarQuestion.model_validate(question)
+    elif question_type.title() == 'College Level':
+        question = CollegeQuestion.model_validate(question)
+    elif question_type.title() == 'Mathworld':
+        question = MathworldQuestion.model_validate(question)
     else:
-        question_type = question['question_type'].strip()
-        
-        if question_type.upper() == 'STAAR':
-            question = StaarQuestion.model_validate(question)
-        elif question_type.title() == 'College Level':
-            question = CollegeQuestion.model_validate(question)
-        elif question_type.title() == 'Mathworld':
-            question = MathworldQuestion.model_validate(question)
+        if question_type:
+            raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                                detail="invalid question type")
         else:
-            if question_type:
-                raise HTTPException(status.HTTP_400_BAD_REQUEST,
-                                    detail="invalid question type")
-            else:
-                raise HTTPException(status.HTTP_400_BAD_REQUEST,
-                                    detail="question_type is required")
-        return question
+            raise HTTPException(status.HTTP_400_BAD_REQUEST,
+                                detail="question_type is required")
+    return question
 
 def updated_question_parser(question):
     if question['question_type'].strip().upper() == 'STAAR':
