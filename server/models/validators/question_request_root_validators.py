@@ -242,9 +242,6 @@ def validate_subject(v):
 
 def validate_keywords(v):
     if(str(type(v)) == "<class 'list'>"):
-        if len(v) > 10:
-            raise HTTPException(status.HTTP_400_BAD_REQUEST,
-                            detail="Max number of keywords reached")
         if(len(v) > 0):
             for value in v:
                 if(str(type(value)) == "<class 'str'>"):
@@ -254,9 +251,6 @@ def validate_keywords(v):
                 else:
                     raise HTTPException(status.HTTP_400_BAD_REQUEST,
                                         detail="all values in keywords must be string")
-                if len(value) > 50:
-                    raise HTTPException(status.HTTP_400_BAD_REQUEST,
-                            detail="Max length of keyword reached")
             return v
         else:
             raise HTTPException(status.HTTP_400_BAD_REQUEST,
