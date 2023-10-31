@@ -12,6 +12,17 @@ from server.models.validators.accounts_validator import (
 )
 
 
+def is_not_empty(cls, values):
+    for attr, value in values.items():
+        if(attr == "middle_name" or attr == 'created_by' or attr == 'updated_by' or attr == "phone_number"):
+            continue
+        else:
+            if(value == ""):
+                raise ValueError(f'{attr} field should not be empty')
+
+    return values
+
+
 class User(Document):
     subscriber_id: str
     first_name: str
@@ -93,6 +104,38 @@ class LogIn(BaseModel):
                 "password": "password",
             }
         }
+
+class Registration(BaseModel):
+    first_name: str
+    middle_name: Optional[str] = None
+    last_name: str
+    role: str
+    school: str
+    email: str
+    password: str
+    repeat_password: str
+    contact_person: Optional[ContactPerson]
+    _no_empty_required_fields =model_validator(mode='before')(is_not_empty)
+    _check_password = model_validator(mode='before')(password_must_be_valid)
+
+    @validator('role')
+    def check_role(cls, v):
+        if v != "student":
+            raise ValueError('role must be a student when creating a student account')
+        
+        return v
+            
+
+    @validator('email')
+    def check_email(cls, v):
+        if v:
+            regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+            if(re.fullmatch(regex, v)):
+                return v
+            else:
+                raise ValueError('email is invalid')
+        else:
+            raise ValueError('email field should not be empty')
 
 # class Registration(Account):
 #     school: Optional[str] = None

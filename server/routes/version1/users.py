@@ -1,31 +1,20 @@
-from fastapi import APIRouter, Request, Depends, status, HTTPException, Body
-from typing import Any
-import math
+from fastapi import APIRouter, Request, Depends, status, HTTPException
 from bson import ObjectId
 from server.authentication.jwt_bearer import JWTBearer
 from server.authentication import jwt_handler
 from server.authentication.bcrypter import Hasher
-from server.connection.database import db
-from server.models.utilities import sample_payloads, model_parser
-from server.models.validators.query_params_validators import validate_query_params
 from server.models.account import (
   LogIn,
   Account,
-  AccountResponseModel,
   SubscriberAccount,
   UpdatedPassword,
   SubscriberAccountResponseModel
 )
 
 from server.models.users import (
-    UserAccounts,
     User,
-    UpdatedUserViaSubscriber,
-    UpdatedStatus,
-    UpdatedRole,
-    ResetPassword,
-    UserResponseModel,
-    InitialUserAccountResponseModel
+    Registration,
+    UpdatedUserViaSubscriber
 )
 
 router = APIRouter()
@@ -54,6 +43,11 @@ async def login(credentials: LogIn):
             
             raise HTTPException(status.HTTP_400_BAD_REQUEST,
                                 detail="An error occured: " + str(e))
+
+
+@router.post("/register", status_code=status.HTTP_200_OK)
+async def login(user: Registration):
+    pass
         
 @router.get("/user_data", dependencies=[Depends(JWTBearer(access_level='subscriber'))], status_code=status.HTTP_200_OK)
 async def get_user_data(request: Request):
@@ -137,4 +131,21 @@ async def change_password(request: Request, updated_password: UpdatedPassword):
         
         if str(e) == '400':
                 raise HTTPException(status.HTTP_400_BAD_REQUEST,
-                                detail="Wrong password") 
+                                detail="Wrong password")
+
+@router.patch("/update/student/contact_person", dependencies=[Depends(JWTBearer(access_level='student'))], status_code=status.HTTP_200_OK)
+async def update_class(request: Request):
+    pass
+
+@router.patch("/update/teacher/education", dependencies=[Depends(JWTBearer(access_level='student'))], status_code=status.HTTP_200_OK)
+async def update_class(request: Request):
+    pass
+
+@router.patch("/update/user_profile_picture", dependencies=[Depends(JWTBearer(access_level='student'))], status_code=status.HTTP_200_OK)
+async def update_class(request: Request):
+    pass
+
+
+@router.delete("/delete/user_profile_picture", dependencies=[Depends(JWTBearer(access_level='student'))], status_code=status.HTTP_200_OK)
+async def update_class(request: Request):
+    pass
